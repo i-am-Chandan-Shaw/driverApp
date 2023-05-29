@@ -1,62 +1,51 @@
-import React, { Fragment }  from 'react';
-import { View } from 'react-native';
+import React  from 'react';
+import { View,Text, Pressable } from 'react-native';
 import GoogleAutocomplete from '../../core/component/GoogleAutocomplete';
 import {REACT_APP_MAPS_API} from '@env'
+import AntIcon from 'react-native-vector-icons/AntDesign'
+import style from './style';
+
 
 const GOOGLE_MAPS_API_KEY = REACT_APP_MAPS_API;
 
 const ChooseLocation = (props) => {
 
     let selectedCoordinates = {
-        pickUp: {
-            lat: '',
-            lng: ''
-        },
-        drop: {
-            lat: '',
-            lng: ''
-        }
+        locationType:'',
+        lat: '',
+        lng: '',
+        selectedAddress:''
     }
 
-    let selectedAddress = {
-        pickUp: '',
-        drop: ''
+    const setCoordinates = (data,details)=>{
+        selectedCoordinates.locationType=props.route.params.locationType;
+        selectedCoordinates.selectedAddress=details.formatted_address;
+        selectedCoordinates.lat = details.geometry.location.lat;
+        selectedCoordinates.lng = details.geometry.location.lng;
+        props.route.params.getCoordinates(selectedCoordinates);
+        props.navigation.goBack()
+        
     }
 
-    const setPickupCords = (data, details) => {
-        selectedAddress.pickUp = details.formatted_address
-        selectedCoordinates.pickUp.lat = details.geometry.location.lat
-        selectedCoordinates.pickUp.lng = details.geometry.location.lng
-        validateCoordinates()
+    const goBack=()=>{
+        props.navigation.goBack()
     }
 
-    const setDropCords = (data, details) => {
-        selectedAddress.drop = details.formatted_address
-        selectedCoordinates.drop.lat = details.geometry.location.lat
-        selectedCoordinates.drop.lng = details.geometry.location.lng
-        validateCoordinates()
-
-    }
-
-    const validateCoordinates = () => {
-        if (selectedCoordinates.pickUp.lat != '' && selectedCoordinates.drop.lat != '') {
-            props.route.params.getCoordinates(selectedCoordinates, selectedAddress);
-            props.navigation.goBack()
-
-        }
-    }
 
     return (
-            <Fragment>
-                <GoogleAutocomplete apiKey={GOOGLE_MAPS_API_KEY} styles={{marginTop:10}} placeholder={'Enter Pickup Location'} onPress={setPickupCords} />
-                <View>
-                    <View></View>
-                    <View></View>
-                    <View></View>
-                </View>
-                <GoogleAutocomplete apiKey={GOOGLE_MAPS_API_KEY} placeholder={'Enter Drop Location'} onPress={setDropCords}/>
-            </Fragment>
-
+        <View style={style.container}>
+            <View style={style.header}>
+                <Pressable onPress={goBack}>
+                    <AntIcon name="arrowleft" size={25} color={'#222'}/>
+                </Pressable>
+                <Text style={style.headerText}>{props.route.params.locationType=='pickup'?'Your Pickup Location':'Your Drop Location'}</Text>
+            </View>
+            <GoogleAutocomplete 
+                onPress={setCoordinates}
+                apiKey={GOOGLE_MAPS_API_KEY} 
+                placeholder={props.route.params.locationType=='pickup'?'Search Pickup Location':'Search Drop Location'} 
+                />
+        </View>
     )
 }
 
