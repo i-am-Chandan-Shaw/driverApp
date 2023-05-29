@@ -509,7 +509,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "LoadGo/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Load Go";
+				INFOPLIST_KEY_CFBundleDisplayName = "loadGoDriver";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -536,7 +536,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = "LoadGo/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Load Go";
+				INFOPLIST_KEY_CFBundleDisplayName = "loadGoDriver";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
