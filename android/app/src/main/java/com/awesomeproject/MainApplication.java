@@ -1,4 +1,4 @@
-package com.loadgo;
+package com.loadgopartner;
 
 import android.app.Application;
 import com.facebook.react.PackageList;
