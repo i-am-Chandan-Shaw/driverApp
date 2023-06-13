@@ -1,7 +1,8 @@
 import React from 'react';
 import { View,Text } from 'react-native';
-import RideStatus from '../../core/component/TripStatus';
+import RideStatus from '../../core/component/RideStatus';
 import style from './style';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const RideHistory=()=>{
 
@@ -34,13 +35,10 @@ const RideHistory=()=>{
     ]
 
 return (
-    <View>
-        <View style={style.headerContainer}>
-            <Text style={style.subHeaderText}>Trip History</Text>
-        </View>
+    <ScrollView style={style.mainContainer}>
         <RideStatus data={rideData[0]}/>
         <RideStatus data={rideData[1]}/>
-    </View>
+    </ScrollView>
     )
 }
 

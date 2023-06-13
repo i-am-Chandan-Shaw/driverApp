@@ -12,7 +12,7 @@ const RideStatus = ({ data }) => {
         navigation.navigate('TripDetails',{tripDetails:data})
     }
     return (
-        <Pressable onPress={showTripDetails}>
+        <Pressable android_ripple={{color: '#eee', borderless: false}} onPress={showTripDetails}>
             <View style={style.container}>
                 <View style={style.leftContainer}>
                     <View style={style.headerContainer}>
@@ -23,6 +23,10 @@ const RideStatus = ({ data }) => {
                         <View>
                             <Text style={[style.subHeaderText]} >{data.status} </Text>
                         </View>
+                        <View style={{ marginBottom: 2 }}>
+                            <FeatherIcon name='chevron-right' size={20} />
+                        </View>
+                        <Text style={[style.subHeaderText,{color:data.status=='Cancelled'?'red':'green'}]} > ₹ {data.amount} </Text>
                     </View>
                     <View style={style.locationContainer}>
                         <View style={style.timeLine}>
@@ -37,7 +41,7 @@ const RideStatus = ({ data }) => {
                         </View>
                     </View>
                 </View>
-                <View style={style.rightContainer}>
+                {/* <View style={style.rightContainer}>
                     <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                         <Image style={style.image} source={imagePath[data.vehicleType]} />
                         <Text style={style.text}>{data.vehicleName}</Text>
@@ -45,7 +49,7 @@ const RideStatus = ({ data }) => {
                     <View>
                         <Text style={[style.subHeaderText]} > ₹ {data.amount} </Text>
                     </View>
-                </View>
+                </View> */}
             </View>
         </Pressable>
     )

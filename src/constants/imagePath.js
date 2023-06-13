@@ -8,5 +8,6 @@ export default{
     cash:require('../assets/images/cash.png'),
     discount:require('../assets/images/discount.png'),
     deliveryBoy:require('../assets/illustrations/delivery-boy.gif'),
-    truck:require('../assets/images/minitruck.png')
+    truck:require('../assets/images/minitruck.png'),
+    van:require('../assets/images/van.png')
 }

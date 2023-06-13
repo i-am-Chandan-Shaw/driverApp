@@ -2,31 +2,31 @@ import React from "react";
 import { Provider as PaperProvider, BottomNavigation } from 'react-native-paper';
 import Dashboard from "../Dashboard";
 import Account from "../Account";
-import Orders from "../Orders";
-import RideHistory from "../TripHistory";
+import Incentive from "../Incentive";
+import Earnings from "../Earnings";
 
 
 const AccountRoute = () => <Account/>;
-const Recents = () => <RideHistory/>;
-const Notification = () => <Orders/>;
+const Recents = () => <Earnings/>;
+const Notification = () => <Incentive/>;
 
 
 
 const Home=()=>{
-    const [index, setIndex] = React.useState(0);
+    const [index, setIndex] = React.useState(2);
     
     const [routes] = React.useState([
         { key: 'dashboard', title: 'Home', focusedIcon: 'home', unfocusedIcon: 'home'},
-        { key: 'notifications', title: 'Orders', focusedIcon: 'bell', unfocusedIcon: 'bell-outline', badge:2 },
-        { key: 'recents', title: 'History', focusedIcon: 'history' },
+        { key: 'incentives', title: 'Incentives', focusedIcon: 'gift', unfocusedIcon: 'gift-outline' },
+        { key: 'earnings', title: 'Earnings', focusedIcon: 'cash' },
         { key: 'accounts', title: 'Account', focusedIcon: 'account' },
     ]);
 
     const renderScene = BottomNavigation.SceneMap({
         dashboard: Dashboard,
         accounts: AccountRoute,
-        recents: Recents,
-        notifications: Notification,
+        earnings: Recents,
+        incentives: Notification,
         
   });
     return(

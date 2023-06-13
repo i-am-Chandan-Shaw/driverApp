@@ -116,7 +116,7 @@ const AccountList = () => {
     ]
     let listArr = listItemDetails.map(item => (
         <View key={item.id}>
-            <Pressable onPress={item.onPress? item.onPress : noop}>
+            <Pressable android_ripple={{color: '#eee', borderless: false}} onPress={item.onPress? item.onPress : noop}>
                 <View style={style.list}>
                     <View style={style.leftSection}>
                     <View style={[style.listIcon, { backgroundColor: item.backgroundColor }]} >

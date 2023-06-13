@@ -5,6 +5,7 @@ const style = StyleSheet.create({
       height:'100%',
       width:'100%',
       position:'relative',
+      backgroundColor:'#fff'
    },
    backButton:{
       position:'absolute',
@@ -29,6 +30,55 @@ const style = StyleSheet.create({
    mapContainer:{
       width: '100%', 
       height: height
+   },
+   dutyOnContainer:{
+      backgroundColor:'#222',
+      alignSelf:'center',
+      position:'absolute',
+      top:0,
+      zIndex:100,
+      borderColor:'#d6d6d6',
+      borderWidth:1,
+      padding:10,
+      paddingHorizontal:20,
+      borderRadius:20,
+      flexDirection:'row',
+      alignItems:'center',
+      justifyContent:'center',
+      marginTop:5,
+      width:170,
+   },
+   dutyOffContainer:{
+      backgroundColor:'#eee',
+      alignSelf:'center',
+      position:'absolute',
+      top:0,
+      zIndex:100,
+      borderColor:'#444',
+      borderWidth:1,
+      padding:10,
+      paddingHorizontal:20,
+      borderRadius:20,
+      flexDirection:'row',
+      alignItems:'center',
+      justifyContent:'center',
+      marginTop:5,
+      width:170,
+   },
+   image:{
+      height:376,
+      width:376
+   },
+   waitingContainer:{
+      flexDirection:'column',
+      flexGrow:1,
+      alignItems:'center',
+      justifyContent:'center',
+   },
+   mediumText:{
+      fontSize:20,
+      color:'#000',
+      fontFamily: "Poppins-SemiBold",
    }
    
 });

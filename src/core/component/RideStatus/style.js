@@ -10,8 +10,12 @@ const style = StyleSheet.create({
         width:width,
         borderBottomColor:'#ddd',
         borderBottomWidth:1,
-        paddingTop:0,
-        marginBottom:20
+        marginBottom:10,
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        elevation:5,
+        width:width*0.96,
+        alignSelf:'center',
     },
     image: {
         height: 30,
@@ -42,7 +46,7 @@ const style = StyleSheet.create({
     locationContainer:{
         flexDirection:'row',
         alignItems:'center',
-        width:width-100,
+        width:width-75,
 
     },
     locationText:{
