@@ -46,7 +46,7 @@ return (
             <AntIcon name='arrowright' size={24} color='#000' />
         </Pressable>
         <Pressable android_ripple={{color: '#eee', borderless: false}} 
-        onPress={()=>{navigateTo('orders')}} style={[style.boxContainer]}>
+        onPress={()=>{navigateTo('EarningHistory')}} style={[style.boxContainer]}>
             <View style={style.optionContainer}>
                 <FAIcon name='bank' size={20} color='#228b22' />
                 <View style={{marginHorizontal:20}}>

@@ -62,7 +62,7 @@ const style = StyleSheet.create({
     },
     subHeaderText: {
         fontFamily: 'Poppins-SemiBold',
-        fontSize: FontSize.small,
+        fontSize: 12,
         color: '#000'
     },
     headerContainer:{

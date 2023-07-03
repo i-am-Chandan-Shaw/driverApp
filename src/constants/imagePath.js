@@ -7,7 +7,8 @@ export default{
     bolero:require('../assets/images/bolero.png'),
     cash:require('../assets/images/cash.png'),
     discount:require('../assets/images/discount.png'),
-    deliveryBoy:require('../assets/illustrations/delivery-boy.gif'),
     truck:require('../assets/images/minitruck.png'),
-    van:require('../assets/images/van.png')
+    van:require('../assets/images/van.png'),
+    arrowRight:require('../assets/images/arrow-left.png'),
+    arrowLeft:require('../assets/images/arrow-right.png'),
 }

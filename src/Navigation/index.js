@@ -7,9 +7,10 @@ import SplashScreen from '../screen/SplashScreen';
 import BookingScreen from '../screen/BookingScreen';
 import Login from '../screen/Login';
 import TripDetails from '../screen/TripDetails';
-import LiveTracking from '../screen/LiveTracking';
 import RideHistory from '../screen/RideHistory';
 import Wallet from '../screen/Wallet';
+import EarningHistory from '../screen/EarningHistory';
+import Verification from '../screen/Verification';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +23,8 @@ return (
         <Stack.Screen name="Home"  component={Home} />
         <Stack.Screen name="BookingScreen" component={BookingScreen} />
         <Stack.Screen name="ChooseLocation" component={ChooseLocation} />
+        <Stack.Screen name="Verification" options={{headerShown:true, title:'Verification'}} component={Verification} />
+        <Stack.Screen name="EarningHistory" options={{headerShown:true, title:'Earning History'}} component={EarningHistory} />
         <Stack.Screen name="RideHistory" options={{headerShown:true, title:'Orders'}}  component={RideHistory} />
         <Stack.Screen name="Wallet" options={{headerShown:true, title:'Wallet'}}  component={Wallet} />
         <Stack.Screen name="TripDetails"  options={{headerShown:true, title:'Trip Details'}}  component={TripDetails} />

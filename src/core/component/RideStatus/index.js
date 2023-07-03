@@ -18,13 +18,13 @@ const RideStatus = ({ data }) => {
                     <View style={style.headerContainer}>
                         <Text style={[style.subHeaderText]} >{data.date}, {data.time}  </Text>
                         <View style={{ marginBottom: 2 }}>
-                            <FeatherIcon name='chevron-right' size={20} />
+                            <FeatherIcon name='chevron-right' size={18} />
                         </View>
                         <View>
                             <Text style={[style.subHeaderText]} >{data.status} </Text>
                         </View>
                         <View style={{ marginBottom: 2 }}>
-                            <FeatherIcon name='chevron-right' size={20} />
+                            <FeatherIcon name='chevron-right' size={18} />
                         </View>
                         <Text style={[style.subHeaderText,{color:data.status=='Cancelled'?'red':'green'}]} > ₹ {data.amount} </Text>
                     </View>

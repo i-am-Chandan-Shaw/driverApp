@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, Share,Alert,Linking } from 'react-native';
 import style from './style';
 import FeatherIcon from 'react-native-vector-icons/Feather';
+import MatIcon from 'react-native-vector-icons/MaterialIcons'
 import { Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -48,19 +49,24 @@ const AccountList = () => {
           Alert.alert(error.message);
         }
       };
+    
+    const openVerificationScreen=()=>{
+      navigation.navigate('Verification')
+    }
 
     const listItemDetails = [
         {
             id: 0,
-            title: 'Email',
-            description: 'chandan.shaw2023@gmail.com',
-            icon: 'mail',
+            title: 'Verification',
+            description: '',
+            icon: 'verified',
             iconColor: '#fff',
-            backgroundColor: '#19A7CE',
+            backgroundColor: '#0B6623',
             buttonText: '',
             buttonType: '',
             buttonColor: '',
-            nextPage:false
+            nextPage:true,
+            onPress:openVerificationScreen
         },
         {
             id: 1,
@@ -120,7 +126,8 @@ const AccountList = () => {
                 <View style={style.list}>
                     <View style={style.leftSection}>
                     <View style={[style.listIcon, { backgroundColor: item.backgroundColor }]} >
-                        <FeatherIcon name={item.icon} color="#fff" size={21} />
+                        {item.title !='Verification' && <FeatherIcon name={item.icon} color="#fff" size={21} />}
+                        { item.title =='Verification' && <MatIcon name={item.icon} color="#fff" size={21} />}
                     </View>
                     <View>
                         <Text style={style.listTitle}>{item.title}</Text>
