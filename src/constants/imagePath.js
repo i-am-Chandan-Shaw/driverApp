@@ -11,4 +11,5 @@ export default{
     van:require('../assets/images/van.png'),
     arrowRight:require('../assets/images/arrow-left.png'),
     arrowLeft:require('../assets/images/arrow-right.png'),
+    docReview:require('../assets/images/docReview.jpg')
 }

@@ -1,9 +1,10 @@
 import { StyleSheet,Dimensions } from 'react-native';
+import FontSize from '../../constants/FontSize';
 const { width, height } = Dimensions.get('window');
 
 
 const style = StyleSheet.create({
-    mainContainer:{
+    docContainer:{
         alignSelf:'center',
         flexDirection:'column',
         justifyContent:'space-between',
@@ -11,11 +12,34 @@ const style = StyleSheet.create({
         padding:20,
         marginRight:-20
     },
+    submitContainer:{
+      flexDirection:'column',
+      alignItems:'center',
+      justifyContent:'center',
+      height:'100%',
+      width:'100%',
+      backgroundColor:'#fff'
+    },
+    headerText: {
+      fontFamily: "Poppins-SemiBold",
+      fontSize: 24,
+      color: "#000",
+      marginTop:20,
+      width:'60%'
+    },
+    subHeaderText: {
+      marginTop:20,
+      fontFamily: "Poppins-SemiBold",
+      fontSize:12,
+      width:'80%',
+      marginTop:10
+    },
     uploadCardContainer:{
         width:width*0.9,
         alignSelf:'center',
         marginBottom:10,
-        marginTop:10
+        marginTop:10,
+        marginBottom:20
     },
      uploadCard:{
         flexDirection:'column',
@@ -53,9 +77,19 @@ const style = StyleSheet.create({
         right:10,
         top:10
      },
-     footerContainer:{
-      
-     }
+     cameraOption:{
+      flexDirection:'row', 
+      alignItems:'center', 
+      justifyContent:'center',
+      paddingVertical:15,
+     },
+     bottomSheetPopup:{
+      flexDirection:'column',
+      justifyContent:'center',
+      alignItems:'center',
+      height:'100%'
+     },
+   
 });
 
 export default style;

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Dimensions, Image, Platform, TouchableOpacity, Text, Switch } from 'react-native';
+import { View, Dimensions, Image, Platform, TouchableOpacity, Text,Linking, Switch } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MapView, { Marker, AnimatedRegion, Circle } from 'react-native-maps';
@@ -12,7 +12,6 @@ import { REACT_APP_MAPS_API } from '@env';
 import CustomMarker from '../../core/component/CustomMarker';
 import IonicIcon from 'react-native-vector-icons/Ionicons'
 import { Button } from 'react-native-paper';
-import ReceiverDetails from '../../core/View/ReceiverDetails';
 const GOOGLE_MAPS_API_KEY = REACT_APP_MAPS_API;
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -61,14 +60,15 @@ const Dashboard = () => {
     useEffect(() => {
         if (isDutyOn) {
             mapRef.current.animateToRegion({
-                latitude: state.pickupCords.latitude,
-                longitude: state.pickupCords.longitude,
+                latitude: currentLocation.latitude,
+                longitude: currentLocation.longitude,
                 latitudeDelta: LATITUDE_DELTA,
                 longitudeDelta: LONGITUDE_DELTA
             });
         }
 
-    }, [state.pickupCords])
+    }, [currentLocation])
+    
 
     const startFetchingLocation = () => {
         const interval = setInterval(() => {
@@ -82,8 +82,8 @@ const Dashboard = () => {
             const status = await locationPermission()
             if (status) {
                 const { latitude, longitude } = await getCurrentLocation();
+                console.log(latitude, longitude );
                 animate(latitude, longitude);
-                onCenter();
                 setCurrentLocation(() => {
                     return ({
                         latitude: latitude,
@@ -117,6 +117,25 @@ const Dashboard = () => {
 
     }
 
+    const getUserLocation = async () => {
+        try {
+            const status = await locationPermission();
+            const { latitude, longitude } = await getCurrentLocation();
+            animate(latitude, longitude);
+            setCurrentLocation(() => {
+                return ({
+                    latitude: latitude,
+                    longitude: longitude,
+                    latitudeDelta: LATITUDE_DELTA,
+                    longitudeDelta: LONGITUDE_DELTA,
+                })
+            })
+            
+        } catch (error) {
+            console.log(error);
+            Linking.openSettings()
+        }
+    }
     const animate = (latitude, longitude) => {
         const newCoordinate = { latitude, longitude };
         if (Platform.OS == 'android') {
@@ -170,6 +189,7 @@ const Dashboard = () => {
     }
 
     const onCenter = () => {
+        console.log('center');
         mapRef.current.animateToRegion({
             latitude: currentLocation.latitude,
             longitude: currentLocation.longitude,
@@ -181,6 +201,8 @@ const Dashboard = () => {
     const openBottomSheet = () => {
         bottomSheetRef.current?.present()
     }
+
+    
 
     const cancelRoute = async () => {
         setState({
@@ -235,6 +257,7 @@ const Dashboard = () => {
                     {!isDutyOn && <View style={style.waitingContainer}>
                         <Image style={style.image} source={imagePath.van} />
                         <Text style={style.mediumText}>Go ON DUTY to start earning !</Text>
+                        <Button onPress={getUserLocation}>open setting</Button>
                     </View>}
 
                     {isDutyOn && (<MapView ref={mapRef} style={style.mapContainer}
