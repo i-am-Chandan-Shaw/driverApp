@@ -9,9 +9,7 @@ import Vehicle from '../../component/Vehicle';
 
 const ChooseVehicle=({onPress, amount, paymentMode, changeMethod})=>{
 
-    useEffect(()=>{
-        console.log(amount);
-    },[])
+
 
     const applyCupon=()=>{
         Alert.alert('No Coupons Available !')

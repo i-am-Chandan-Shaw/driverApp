@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, Pressable, Share,Alert,Linking } from 'react-native';
 import style from './style';
 import FeatherIcon from 'react-native-vector-icons/Feather';
-import MatIcon from 'react-native-vector-icons/MaterialIcons'
+import MatIcon from 'react-native-vector-icons/MaterialIcons';
+import FAIcon from 'react-native-vector-icons/FontAwesome';
 import { Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -54,6 +55,10 @@ const AccountList = () => {
       navigation.navigate('Verification')
     }
 
+    const openBankDetailsScreen = ()=>{
+      navigation.navigate('BankDetails')
+    }
+
     const listItemDetails = [
         {
             id: 0,
@@ -68,6 +73,19 @@ const AccountList = () => {
             nextPage:true,
             onPress:openVerificationScreen
         },
+        {
+          id: 6,
+          title: 'Bank Details',
+          description: '',
+          icon: 'bank',
+          iconColor: '#fff',
+          backgroundColor: '#EA906C',
+          buttonText: '',
+          buttonType: '',
+          buttonColor: '',
+          nextPage:true,
+          onPress:openBankDetailsScreen
+      },
         {
             id: 1,
             title: 'Invite',
@@ -126,8 +144,9 @@ const AccountList = () => {
                 <View style={style.list}>
                     <View style={style.leftSection}>
                     <View style={[style.listIcon, { backgroundColor: item.backgroundColor }]} >
-                        {item.title !='Verification' && <FeatherIcon name={item.icon} color="#fff" size={21} />}
+                        {(item.title !='Verification' && item.title !='Bank Details') && <FeatherIcon name={item.icon} color="#fff" size={21} />}
                         { item.title =='Verification' && <MatIcon name={item.icon} color="#fff" size={21} />}
+                        { item.title =='Bank Details' && <FAIcon name={item.icon} color="#fff" size={16} />}
                     </View>
                     <View>
                         <Text style={style.listTitle}>{item.title}</Text>

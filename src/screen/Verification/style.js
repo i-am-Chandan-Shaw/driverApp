@@ -10,7 +10,8 @@ const style = StyleSheet.create({
         justifyContent:'space-between',
         height:'100%',
         padding:20,
-        marginRight:-20
+        marginRight:-20,
+        backgroundColor:'#fff'
     },
     submitContainer:{
       flexDirection:'column',

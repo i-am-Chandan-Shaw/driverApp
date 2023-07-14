@@ -1,10 +1,14 @@
-import React  from 'react';
+import React, { useContext, useEffect }  from 'react';
 import { View, Text} from 'react-native';
 import { Avatar } from 'react-native-paper';
 import style from './style';
 import AccountList from '../../core/component/AccountList';
+import { AppContext } from '../../core/helper/AppContext';
 
-const Account=()=>{
+const Account=(props)=>{
+    const { globalData, setGlobalData } = useContext(AppContext) 
+    useEffect(()=>{
+    },[globalData])
 
 return (
     <View>

@@ -12,6 +12,10 @@ import { REACT_APP_MAPS_API } from '@env';
 import CustomMarker from '../../core/component/CustomMarker';
 import IonicIcon from 'react-native-vector-icons/Ionicons'
 import { Button } from 'react-native-paper';
+import notifee,{ AndroidStyle } from '@notifee/react-native';
+import LocationAccess from '../LocationAccess';
+
+
 const GOOGLE_MAPS_API_KEY = REACT_APP_MAPS_API;
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -27,6 +31,7 @@ const Dashboard = () => {
     const navigation = useNavigation()
 
     // States
+    const [locationAccessed, setLocationAccess]= useState(false)
     const [address, setAddress] = useState({ pickUp: '', drop: '' });
     const [currentLocation, setCurrentLocation] = useState({
         latitude: 22.5629,
@@ -77,12 +82,33 @@ const Dashboard = () => {
         return () => clearInterval(interval)
     }
 
+    // const displayNotification=async()=>{
+    //     const channelId = await notifee.createChannel({
+    //         id: 'default',
+    //         name: 'Default Channel',
+    //       });
+    //     await notifee.displayNotification({
+    //         title: 'Driver Waiting',
+    //         body: 'Main body content of the notification',
+    //         android: {
+    //           channelId,
+    //           style: { type: AndroidStyle.BIGTEXT, text: 'Large volume of text shown in the expanded state Large volume of text shown in the expanded stateLarge volume of text shown in the expanded stateLarge volume of text shown in the expanded stateLarge volume of text shown in the expanded stateLarge volume of text shown in the expanded state' },
+    //           smallIcon: 'location', // optional, defaults to 'ic_launcher'.
+    //           // pressAction is needed if you want the notification to open the app when pressed
+    //           pressAction: {
+    //             id: 'default',
+    //           },
+    //         },
+    //       });
+    // }
+
     const getLiveLocation = async () => {
         try {
+            setLocationAccess(false);
             const status = await locationPermission()
             if (status) {
                 const { latitude, longitude } = await getCurrentLocation();
-                console.log(latitude, longitude );
+                setLocationAccess(true);
                 animate(latitude, longitude);
                 setCurrentLocation(() => {
                     return ({
@@ -119,7 +145,11 @@ const Dashboard = () => {
 
     const getUserLocation = async () => {
         try {
+            setLocationAccess(false);
             const status = await locationPermission();
+            if(status){
+                setLocationAccess(true);
+            }
             const { latitude, longitude } = await getCurrentLocation();
             animate(latitude, longitude);
             setCurrentLocation(() => {
@@ -189,7 +219,6 @@ const Dashboard = () => {
     }
 
     const onCenter = () => {
-        console.log('center');
         mapRef.current.animateToRegion({
             latitude: currentLocation.latitude,
             longitude: currentLocation.longitude,
@@ -236,7 +265,7 @@ const Dashboard = () => {
     return (
         <GestureHandlerRootView>
             <BottomSheetModalProvider>
-                <View style={[style.container]}>
+                {locationAccessed && <View style={[style.container]}>
                     {Object.keys(state.dropCords).length > 0 && (<TouchableOpacity onPress={cancelRoute} style={style.backButton}>
                         <View style={{ marginLeft: 5 }}>
                             <IonicIcon name="arrow-back-circle" size={40} color={'#222'} />
@@ -257,7 +286,6 @@ const Dashboard = () => {
                     {!isDutyOn && <View style={style.waitingContainer}>
                         <Image style={style.image} source={imagePath.van} />
                         <Text style={style.mediumText}>Go ON DUTY to start earning !</Text>
-                        <Button onPress={getUserLocation}>open setting</Button>
                     </View>}
 
                     {isDutyOn && (<MapView ref={mapRef} style={style.mapContainer}
@@ -364,7 +392,8 @@ const Dashboard = () => {
                             
                         </View>
                     </BottomSheetModal>
-                </View>
+                </View>}
+                {!locationAccessed && <LocationAccess onPress={getUserLocation}/>}
             </BottomSheetModalProvider>
         </GestureHandlerRootView>
     )

@@ -62,7 +62,6 @@ const BookingScreen = (props) => {
             dropCoords: props.route.params.locationDetails.drop,
             amount: props.route.params.locationDetails.amount
         });
-        console.log(state.dropCoords,'--->');
     }, [])
 
     const [paymentModal, setPaymentModal] = useState(false);

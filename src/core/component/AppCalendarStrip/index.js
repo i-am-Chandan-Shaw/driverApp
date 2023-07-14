@@ -28,8 +28,6 @@ const AppCalendarStrip = () => {
             count++;
         }
 
-        console.log(previousMonday);
-
         setDateObj({
             minDate: previousMonday,
             maxDate: currentDate,

@@ -4,38 +4,39 @@ import Dashboard from "../Dashboard";
 import Account from "../Account";
 import Incentive from "../Incentive";
 import Earnings from "../Earnings";
+import Duty from "../Duty";
 
 
-const AccountRoute = () => <Account/>;
-const Recents = () => <Earnings/>;
-const Notification = () => <Incentive/>;
+const Home = () => {
+    const [index, setIndex] = React.useState(0);
 
-
-
-const Home=()=>{
-    const [index, setIndex] = React.useState(2);
-    
     const [routes] = React.useState([
-        { key: 'dashboard', title: 'Home', focusedIcon: 'home', unfocusedIcon: 'home'},
+        { key: 'dashboard', title: 'Home', focusedIcon: 'home', unfocusedIcon: 'home' },
         { key: 'incentives', title: 'Incentives', focusedIcon: 'gift', unfocusedIcon: 'gift-outline' },
         { key: 'earnings', title: 'Earnings', focusedIcon: 'cash' },
-        { key: 'accounts', title: 'Account', focusedIcon: 'account' },
+        { key: 'accounts', title: 'Account', data: { id: 23 }, focusedIcon: 'account' },
     ]);
 
-    const renderScene = BottomNavigation.SceneMap({
-        dashboard: Dashboard,
-        accounts: AccountRoute,
-        earnings: Recents,
-        incentives: Notification,
-        
-  });
-    return(
+    return (
         <PaperProvider>
             <BottomNavigation
                 navigationState={{ index, routes }}
                 onIndexChange={setIndex}
-                renderScene={renderScene}
-                />
+                renderScene={({ route }) => {
+                    switch (route.key) {
+                        case 'dashboard':
+                            return <Duty/>;
+                        case 'incentives':
+                            return <Incentive/>;
+                        case 'earnings':
+                            return <Earnings/>;
+                        case 'accounts':
+                            return <Account/>;
+                        default:
+                            return null;
+                    }
+                }}
+            />
         </PaperProvider>
     )
 }
