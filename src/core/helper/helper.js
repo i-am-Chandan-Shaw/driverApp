@@ -43,7 +43,7 @@ export const getCurrentLocation = () => new Promise((resolve, reject) => {
             resolve(cords);
         },
         error => {
-            reject(error.message)
+            reject('getCurrentLocation error',error.message)
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
     )

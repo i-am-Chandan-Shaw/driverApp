@@ -4,13 +4,15 @@ import style from './style';;
 import AppTextInput from '../../core/component/AppTextInput';
 import { Picker } from '@react-native-picker/picker';
 import { Snackbar, Provider, ActivityIndicator } from 'react-native-paper';
-import { patch } from '../../core/helper/services';
+import { get, patch } from '../../core/helper/services';
 import { AppContext } from '../../core/helper/AppContext';
+import AppLoader from '../../core/component/AppLoader';
 
 const BankDetails = () => {
     const { globalData, setGlobalData } = useContext(AppContext)
     useEffect(() => {
-        console.log('Bank screen==>', globalData?.driverId);
+        console.log(globalData);
+        setDriverLocally(globalData?.driverId)
     }, [globalData])
 
     const [accountType, setAccountType] = useState('saving');
@@ -25,7 +27,7 @@ const BankDetails = () => {
         accountNumber: '',
         branchName: '',
         swiftCode: '',
-        city: '',
+        bankLocation: '',
         accountType: accountType
     });
 
@@ -40,6 +42,7 @@ const BankDetails = () => {
             if (data) {
                 console.log(data);
                 setIsLoading(false);
+                
             }
         } catch (error) {
             console.log(error);
@@ -47,6 +50,31 @@ const BankDetails = () => {
         }
 
 
+    }
+
+    const setDriverLocally=async(id)=>{
+        setIsLoading(true)
+        const queryParameter = '?driverId='+id.toString()
+        try {
+            const data = await get('getDriver',queryParameter);
+            if (data) {
+                setBankDetails({
+                    id:globalData?.driverId,
+                    accountHolderName: data[0].accountHolderName,
+                    bankName: data[0].bankName,
+                    accountNumber: data[0].accountNumber,
+                    branchName: data[0].branchName,
+                    swiftCode: data[0].swiftCode,
+                    bankLocation: data[0].bankLocation,
+                    accountType: data[0].accountType
+                })
+                setIsLoading(false);
+                setValid(isDataValid);
+            }
+        } catch (error) {
+            console.log(error);
+            setIsLoading(false)
+        }
     }
 
     const validateInputs = (text, type) => {
@@ -92,6 +120,7 @@ const BankDetails = () => {
     return (
         <ScrollView automaticallyAdjustKeyboardInsets={true} style={style.container}>
             <Provider>
+                {isLoading && <AppLoader styles={{top:'40%'}}/>}
                 <View style={style.mainContainer} onPress={Keyboard.dismiss}>
                     <View>
                         <Text style={[style.subHeaderText]} >Account Information: </Text>
@@ -133,8 +162,8 @@ const BankDetails = () => {
                                 style={{ width: '48%', textTransform: 'uppercase' }}
                                 placeholder="IFSC CODE" />
                             <AppTextInput
-                                onChangeText={(text) => validateInputs(text, 'city')}
-                                value={bankDetails.city}
+                                onChangeText={(text) => validateInputs(text, 'bankLocation')}
+                                value={bankDetails.bankLocation}
                                 height={50}
                                 style={{ width: '48%' }}
                                 placeholder="City" />
@@ -151,7 +180,7 @@ const BankDetails = () => {
 
                     <TouchableOpacity disabled={!valid}  style={[style.signInButton, !valid ? style.signInButtonDisabled : {}]} onPress={updateBankDetails}>
                         <View style={{ width: 30 }} />
-                        <Text style={style.signInText} >Add Bank Account
+                        <Text style={style.signInText} >{bankDetails.accountNumber.length==0 ? 'Add Bank Account':'Update Bank Account'}
                         </Text>
                         <View style={{ width: 30 }}>
                             {isLoading && <ActivityIndicator animating={true} color={'#fff'} />}

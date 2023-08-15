@@ -13,7 +13,7 @@ import { ActivityIndicator } from 'react-native-paper';
 import { Snackbar } from 'react-native-paper';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { post } from "../../core/helper/services";
+import { get, post } from "../../core/helper/services";
 import { AppContext } from "../../core/helper/AppContext";
 
 
@@ -76,10 +76,8 @@ const Login = ({ navigation }) => {
                 if(data.isRegistered){
                     setLoading(false);
                     setAuthenticated(data.id);
-                    setGlobalData({
-                        driverId:data.id,
-                        ...globalData
-                      });
+                    setDriverLocally(data.id)
+                    setGlobalData('driverId',data.id);
                     navigation.replace('Home');
                 }else{
                     navigation.replace('Register',{phone:phone});
@@ -94,6 +92,8 @@ const Login = ({ navigation }) => {
 
 
 
+
+
     // Set local storage
     const setAuthenticated = async (id) => {
         try {
@@ -102,6 +102,19 @@ const Login = ({ navigation }) => {
             console.log('Data saved successfully!');
         } catch (error) {
             console.log('Error saving data:', error);
+        }
+    }
+
+    const setDriverLocally=async(id)=>{
+        const queryParameter = '?driverId='+id.toString()
+        try {
+            const data = await get('getDriver',queryParameter);
+            if (data) {
+                await AsyncStorage.setItem('driverData', JSON.stringify(data));
+                setGlobalData('driverData', data);
+            }
+        } catch (error) {
+            console.log(error);
         }
     }
 

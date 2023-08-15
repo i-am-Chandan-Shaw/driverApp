@@ -1,4 +1,4 @@
-import React, { useContext, useEffect }  from 'react';
+import React, { useContext, useEffect, useState }  from 'react';
 import { View, Text} from 'react-native';
 import { Avatar } from 'react-native-paper';
 import style from './style';
@@ -7,7 +7,11 @@ import { AppContext } from '../../core/helper/AppContext';
 
 const Account=(props)=>{
     const { globalData, setGlobalData } = useContext(AppContext) 
+    const [driverData,setDriverData]= useState(null)
     useEffect(()=>{
+        console.log(globalData);
+        setDriverData(globalData.driverData[0])
+        
     },[globalData])
 
 return (
@@ -15,9 +19,9 @@ return (
         <View style={style.headerContainer}>
             <Avatar.Icon size={50} icon="account" color='#fff' style={{backgroundColor:'#858f9e'}}  />
             <View style={style.headerTextContainer}>
-                <Text numberOfLines={1} style={style.nameText}>Chandan Kumar Shaw</Text>
+                <Text numberOfLines={1} style={style.nameText}>{driverData?.driverName}</Text>
                 <View style={style.subHeaderTextContainer}>
-                    <Text style={style.phoneText}>+91 9874771340</Text>
+                    <Text style={style.phoneText}>{driverData?.phone}</Text>
                     <View style={style.editContainer}>
                         {/* <FeatherIcon name='edit' size={16} color='#000' /> */}
                     </View>

@@ -18,7 +18,7 @@ const style = StyleSheet.create({
       width:'100%',
       flexDirection:'row',
       alignItems:'center',
-      justifyContent:'space-between',
+      justifyContent:'flex-end',
 
      },
      radioItem:{

@@ -164,6 +164,7 @@ const Verification = () => {
                         } else {
                             docType = 'rcFront'
                         }
+                        console.log(response.assets[0].base64);
                         setPic({
                             ...pic,
                             [docType]: response.assets[0].base64

@@ -47,7 +47,6 @@ const Register = ({route, navigation }) => {
         try {
             const data = await post(registeredData,'registerDriver');
             if (data) {
-                console.log(data);
                 setIsLoading(false);
                 setDriverLocally(data.id);
                 setGlobalData({
