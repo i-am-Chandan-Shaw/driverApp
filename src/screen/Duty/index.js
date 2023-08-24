@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Linking, Dimensions, Image, Text, TouchableOpacity } from 'react-native';
+import { View, Linking, Dimensions, Image, Text, TouchableOpacity, Pressable } from 'react-native';
 import { getAddressFromCoordinates, getCurrentLocation, locationPermission } from '../../core/helper/helper';
 import MapView, { Marker, Circle } from 'react-native-maps';
 import LocationAccess from '../LocationAccess';
@@ -9,7 +9,10 @@ import CustomMarker from '../../core/component/CustomMarker';
 import AppSwitch from '../../core/component/AppSwitch';
 import { get, patch, post } from '../../core/helper/services';
 import TripCard from '../../core/component/TripCard';
-import notifee,{ AndroidStyle } from '@notifee/react-native';
+import notifee, { AndroidStyle } from '@notifee/react-native';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import AppLoader from '../../core/component/AppLoader';
 
 
 const { width, height } = Dimensions.get('window');
@@ -20,24 +23,113 @@ const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 const Duty = () => {
     const [locationAccessed, setLocationAccess] = useState(false);
-    const [userData, setUserData] = useState([]);
     const [isDutyOn, setDuty] = useState(false);
     const [currentAddress, setCurrentAddress] = useState('Unknown')
     const [currentLocation, setCurrentLocation] = useState(null);
     const [availableTrips, setAvailableTrips] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isRideActive, setIsRideActive] = useState(false);
+    const [activeRideData,setActiveRideData]=useState(null)
     const [value, setValue] = useState(1);
+    const navigation = useNavigation();
+
     const mapRef = useRef();
     let timeout;
+    let waitForTripStatus
 
     useEffect(() => {
         getUserLocation(false);
+        // changeTripStatus();
+
+        // trackLive()
+        getTripId();
     }, []);
+
+
 
     const changeValue = () => {
         setValue((prev) => {
             return prev + 1
         })
     }
+
+    const checkForActiveTrip = async (id) => {
+        const queryParameter = '?tripId=' + id.toString()
+        try {
+
+            const data = await get('getRequestVehicle', queryParameter);
+            if (data) {
+                console.log(data[0].status);
+                setActiveRideData(data[0])
+                if (data[0].status != 2 && data[0].status != 4) {
+                    clearInterval(waitForTripStatus);
+                    setIsRideActive(false)
+                }else{
+                    setIsRideActive(true);
+                }
+                setIsLoading(false);
+            }
+        } catch (error) {
+            console.log('getTripStatus', error);
+            setIsLoading(false);
+        }
+    }
+
+    const getTripId = async () => {
+        try {
+            setIsLoading(true)
+            const id = await AsyncStorage.getItem('tripId');
+            if (id !== null) {
+                waitForTripStatus = setInterval(() => {
+                    console.log('waiting');
+                    checkForActiveTrip(id);
+                }, 3000)
+            } else {
+                console.log('Data not found!');
+                setIsLoading(false)
+                return false
+            }
+        } catch (error) {
+            console.log('Error retrieving data:', error);
+            setIsLoading(false);
+            return false
+        }
+    }
+
+
+    const trackLive = () => {
+        let trip = activeRideData;
+        if (trip) {
+            const startLatitude = trip.pickUpCoords.pickUpLat;
+            const startLongitude = trip.pickUpCoords.pickUpLng;
+            const destinationLatitude = trip.dropCoords.dropLat;
+            const destinationLongitude = trip.dropCoords.dropLng;
+            const LATITUDE_DELTA = 0.0122
+            const LONGITUDE_DELTA = 0.0061627689429373245
+
+            let data = {
+                "drop": "Drop",
+                "dropCoords": {
+                    "latitude": parseFloat(destinationLatitude),
+                    "longitude": parseFloat(destinationLongitude),
+                    "latitudeDelta": LATITUDE_DELTA,
+                    "longitudeDelta": LONGITUDE_DELTA
+                },
+                "pickup": "pickup",
+                "pickupCoords": {
+                    "latitude": parseFloat(startLatitude),
+                    "longitude": parseFloat(startLongitude),
+                    "latitudeDelta": LONGITUDE_DELTA,
+                    "longitudeDelta": LATITUDE_DELTA
+                },
+
+            }
+
+            navigation.navigate('LiveTracking', { coordinates: data, tripData: trip })
+        }
+
+    }
+
 
 
 
@@ -46,7 +138,6 @@ const Duty = () => {
             findTrips();
         } else {
             setAvailableTrips([])
-            setUserData([]);
         }
     }, [isDutyOn, value])
 
@@ -75,10 +166,10 @@ const Duty = () => {
         try {
             const data = await post(driverCoords, 'getAvailableRides');
             if (data) {
-                setUserDetails(data);
+                console.log(data);
                 setAvailableTrips(data);
                 clearTimeout(timeout);
-                displayNotification();
+
             }
         } catch (error) {
             console.log('getActiveRides=>', error);
@@ -117,26 +208,6 @@ const Duty = () => {
         }
     }
 
-    const setUserDetails = (data) => {
-        data.forEach(element => {
-            getUserDetails(element.userId);
-        });
-        console.log(userData.length, availableTrips.length);
-    }
-
-    const getUserDetails = async (id) => {
-        const queryParameter = '?userId=' + id.toString()
-        try {
-            const data = await get('getUser', queryParameter);
-            if (data) {
-                setUserData((prevData) => {
-                    return [...prevData, data[0]]
-                })
-            }
-        } catch (error) {
-            console.log('getUserDetails', error);
-        }
-    }
 
 
 
@@ -147,55 +218,56 @@ const Duty = () => {
             latitudeDelta: LATITUDE_DELTA,
             longitudeDelta: LONGITUDE_DELTA
         });
-        // openGoogleMapsDirections(startLatitude, startLongitude, destinationLatitude, destinationLongitude)
+
     };
 
 
 
 
-    const openGoogleMapsDirections = (startLat, startLng, destLat, destLng) => {
-        const url = `https://www.google.com/maps/dir/?api=1&origin=${startLat},${startLng}&destination=${destLat},${destLng}`;
-        Linking.openURL(url);
-    };
+
 
     const updatedData = (data, type) => {
         setAvailableTrips(data);
-        setUserData(data);
         if (type == 'declined') {
             findTrips();
-        } else if (type == 'accepted') {
-            setDuty(false)
         }
     }
 
-    const displayNotification=async()=>{
+    const displayNotification = async () => {
         const channelId = await notifee.createChannel({
             id: 'default',
             name: 'Default Channel',
-          });
+        });
         await notifee.displayNotification({
             title: 'New rides are in!',
-            body: 'Main body content of the notification',
+            body: 'Open the app to start driving. Let\'s hit the road! 🚗',
             android: {
-              channelId,
-              style: { type: AndroidStyle.BIGTEXT, text: 'Open the app to start driving. Let\'s hit the road! 🚗' },
-              smallIcon: 'location', // optional, defaults to 'ic_launcher'.
-              // pressAction is needed if you want the notification to open the app when pressed
-              pressAction: {
-                id: 'default',
-                title:'Start'
-              },
+                channelId,
+                style: { type: AndroidStyle.BIGTEXT, text: '' },
+                smallIcon: 'location', // optional, defaults to 'ic_launcher'.
+                // pressAction is needed if you want the notification to open the app when pressed
+                pressAction: {
+                    id: 'default',
+                    title: 'Start'
+                },
             },
-          });
+        });
     }
 
 
     return (
         <View>
             {locationAccessed && <View style={style.container}>
-                <View style={style.dutyContainer}>
+                {isRideActive && <View style={style.navContainer}>
+                    <Text style={{ fontSize: 15, color: '#fff' }}>You currently have an active trip !</Text>
+                    <Pressable style={style.viewButton} onPress={trackLive}>
+                        <Text style={{ fontSize: 13, fontWeight: '500', color: '#000' }}>View</Text>
+                    </Pressable>
+                </View>}
+                {!isRideActive && <View style={style.dutyContainer}>
                     <AppSwitch toggleSwitch={toggleSwitch} />
-                </View>
+                </View>}
+                {isLoading && <AppLoader styles={{top:300}} />}
                 {!isDutyOn && <View style={style.waitingContainer}>
                     <Image style={style.image} source={imagePath.van} />
                     <Text style={style.mediumText}>Go ON DUTY to start earning !</Text>
@@ -204,8 +276,8 @@ const Duty = () => {
 
                 {/* Trip Cards */}
 
-                {(isDutyOn && (availableTrips?.length == userData?.length) && availableTrips.length > 0) && <View style={style.cardsContainer}>
-                    <TripCard sendData={updatedData} userData={userData} cardData={availableTrips}></TripCard>
+                {(isDutyOn && availableTrips.length > 0) && <View style={style.cardsContainer}>
+                    <TripCard sendData={updatedData} cardData={availableTrips}></TripCard>
                 </View>}
 
                 {/* Map */}

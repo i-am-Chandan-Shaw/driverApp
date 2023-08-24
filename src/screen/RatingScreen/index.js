@@ -4,20 +4,23 @@ import style from './style';
 import FAIcon from 'react-native-vector-icons/FontAwesome';
 import { Avatar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { patch } from '../../core/helper/services';
+import AppLoader from '../../core/component/AppLoader';
 
 
 
-const RatingScreen = (props,{headerNav}) => {
+const RatingScreen = (props) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
+  const [tripDetails, setTripDetails] = useState(null)
   const navigation = useNavigation();
-  let amount;
-  let customerName;
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
+    // console.log(props.route.params.tripData);
     console.log(props.route.params.tripData);
-    console.log(props.route.params.userData);
-    
+    setTripDetails(props.route.params.tripData)
+
   }, [])
 
   const handleStarPress = (star) => {
@@ -25,7 +28,6 @@ const RatingScreen = (props,{headerNav}) => {
   };
 
   const handleBackPress = () => {
-    console.log('dsds');
     navigation.reset({
       index: 0,
       routes: [{ name: 'Home' }],
@@ -41,15 +43,40 @@ const RatingScreen = (props,{headerNav}) => {
     // Reset the rating and comment fields after submission
     setRating(0);
     setComment('');
+    patchFeedback();
   };
+
+  const patchFeedback = async () => {
+    const payload = {
+      id: tripDetails?.tripId,
+      feedbackUsersFeedback: comment,
+      feedbackUsersRating: rating
+    }
+    try {
+      setIsLoading(true)
+      const data = await patch(payload, 'patchRequestVehicle');
+      if (data) {
+        console.log(data);
+        setIsLoading(false);
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
+  }
 
   return (
     <View style={style.container}>
+      {isLoading && <AppLoader/>}
       <View style={style.topContainer}>
         <View style={style.header}>
           <Avatar.Icon size={54} icon="account" />
-          <Text style={[style.mediumText, { marginTop: 10 }]}> Rajib Koley</Text>
-          <Text style={[style.boldText, { marginTop: 10 }]}> ₹ 450</Text>
+          <Text style={[style.mediumText, { marginTop: 10 }]}> {tripDetails?.userName} </Text>
+          <Text style={[style.boldText, { marginTop: 10 }]}> ₹ {tripDetails?.amount} </Text>
         </View>
         {/* Star Rating */}
         <View style={style.starContainer}>

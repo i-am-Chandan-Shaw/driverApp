@@ -7,13 +7,14 @@ import { AppContext } from '../../helper/AppContext';
 import { patch } from '../../helper/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const TripCard = ({ cardData, sendData,userData }) => {
+const TripCard = ({ cardData, sendData, userData }) => {
     const [renderedData, setRenderedData] = useState([cardData[0]]);
     const { globalData, setGlobalData } = useContext(AppContext);
-    const [isLoading, setIsLoading]= useState(false)
-    
+    const [isLoading, setIsLoading] = useState(false)
+
     const navigation = useNavigation();
     useEffect(() => {
+        console.log(globalData.driverId);
         let currentIndex = 1;
         const interval = setInterval(() => {
             if (currentIndex < cardData.length) {
@@ -27,32 +28,33 @@ const TripCard = ({ cardData, sendData,userData }) => {
         return () => clearInterval(interval);
     }, []);
 
-    
 
 
-    const declineRide=(item)=>{
-        const updatedData= [...renderedData]
-        let index= updatedData.indexOf(item)
+
+    const declineRide = (item) => {
+        const updatedData = [...renderedData]
+        let index = updatedData.indexOf(item)
         updatedData.splice(index, 1)
         setRenderedData(updatedData);
-        if(updatedData.length==0){
+        if (updatedData.length == 0) {
             sendData(updatedData, 'declined')
         }
     }
 
-    const acceptRide=async(user,trip)=>{
+    const acceptRide = async (trip) => {
         storeTripId(trip.tripId)
         setIsLoading(true)
-        const payload={
-            id:trip.tripId,
-            status:2
+        const payload = {
+            id: trip.tripId,
+            status: 2,
+            driverId:globalData.driverId
         }
         try {
             const data = await patch(payload, 'patchRequestVehicle');
             if (data) {
-                const updatedData= []
-                sendData(updatedData,'accepted');
-                trackLive(user,trip);
+                const updatedData = []
+                sendData(updatedData, 'accepted');
+                trackLive(trip);
                 setIsLoading(false)
             }
         } catch (error) {
@@ -62,36 +64,38 @@ const TripCard = ({ cardData, sendData,userData }) => {
     }
 
 
-    const trackLive = (user) => {
-        const startLatitude = 22.567805; // Replace with your start location's latitude
-        const startLongitude = 88.371133; // Replace with your start location's longitude
-        const destinationLatitude = 22.580873; // Replace with your destination's latitude
-        const destinationLongitude = 88.309744; // Replace with your destination's longitude
-        const LATITUDE_DELTA=0.0122
-        const LONGITUDE_DELTA=0.0061627689429373245
-        
-        let data = {
-            "drop": "Drop",
-            "dropCoords": {
-                "latitude": destinationLatitude,
-                "longitude": destinationLongitude,
-                "latitudeDelta": LATITUDE_DELTA,
-                "longitudeDelta": LONGITUDE_DELTA
-            },
-            "pickup": "pickup",
-            "pickupCoords": {
-                "latitude": startLatitude,
-                "longitude": startLongitude,
-                "latitudeDelta": LONGITUDE_DELTA,
-                "longitudeDelta": LATITUDE_DELTA
-            },
-            
+    const trackLive = (trip) => {
+        if (trip) {
+            const startLatitude = trip.pickUpCoords.pickUpLat; 
+            const startLongitude = trip.pickUpCoords.pickUpLng; 
+            const destinationLatitude = trip.dropCoords.dropLat;  
+            const destinationLongitude = trip.dropCoords.dropLng; 
+            const LATITUDE_DELTA = 0.0122
+            const LONGITUDE_DELTA = 0.0061627689429373245
+
+            let data = {
+                "drop": "Drop",
+                "dropCoords": {
+                    "latitude": parseFloat(destinationLatitude),
+                    "longitude": parseFloat(destinationLongitude),
+                    "latitudeDelta": LATITUDE_DELTA,
+                    "longitudeDelta": LONGITUDE_DELTA
+                },
+                "pickup": "pickup",
+                "pickupCoords": {
+                    "latitude": parseFloat(startLatitude),
+                    "longitude": parseFloat(startLongitude),
+                    "latitudeDelta": LONGITUDE_DELTA,
+                    "longitudeDelta": LATITUDE_DELTA
+                },
+
+            }
+
+            navigation.navigate('LiveTracking', { coordinates: data, tripData: trip })
         }
 
-        
-
-        navigation.navigate('LiveTracking', { details: data, userData: user })
     }
+
 
     const storeTripId = async (id) => {
         try {
@@ -102,17 +106,16 @@ const TripCard = ({ cardData, sendData,userData }) => {
         }
     }
 
-    
 
 
-    const renderItem = ({ item,index }) => {
-        console.log('==>',item,index)
+
+    const renderItem = ({ item, index }) => {
         return (
             <View style={style.cards}>
                 {/* <ProgressBar style={{borderRadius:10}} progress={0.5} color={'blue'} /> */}
-                <View style={style.headerContainer}> 
+                <View style={style.headerContainer}>
                     <Avatar.Icon color='#ddd' size={28} icon="account" />
-                    <Text style={[style.headerText,{marginLeft:10}]}>{userData[index]?.name}(4.3)</Text>
+                    <Text style={[style.headerText, { marginLeft: 10 }]}>{item?.userName}(4.3)</Text>
                 </View>
                 <View style={style.topContainer}>
                     <View style={style.locationContainer}>
@@ -134,11 +137,11 @@ const TripCard = ({ cardData, sendData,userData }) => {
                     </View>
                 </View>
                 <View style={style.bottomContainer}>
-                    <TouchableOpacity onPress={()=>{declineRide(item)}} style={[style.button, {}]}>
+                    <TouchableOpacity onPress={() => { declineRide(item) }} style={[style.button, {}]}>
                         <Text style={style.btnText}>Decline</Text>
                     </TouchableOpacity>
                     <View style={{ width: 10 }} />
-                    <TouchableOpacity onPress={()=>{acceptRide(userData[index],cardData[index])}} style={[style.button, { backgroundColor: '#4CAF50', }]}>
+                    <TouchableOpacity onPress={() => { acceptRide(cardData[index]) }} style={[style.button, { backgroundColor: '#4CAF50', }]}>
                         <Text style={[style.btnText]}>Accept</Text>
                     </TouchableOpacity>
                 </View>

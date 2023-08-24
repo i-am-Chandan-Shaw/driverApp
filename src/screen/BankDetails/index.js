@@ -17,7 +17,7 @@ const BankDetails = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [valid, setValid] = useState(false);
     const [bankDetails, setBankDetails] = useState({
-        id:globalData?.driverId,
+        id: globalData?.driverId,
         accountHolderName: '',
         bankName: '',
         accountNumber: '',
@@ -27,45 +27,53 @@ const BankDetails = () => {
         accountType: accountType
     });
 
-    useEffect(()=>{
-        setDriverLocally(globalData?.driverId)
-    },[])
+    useEffect(() => {
+        setDriverLocally(globalData?.driverId);
+        setValid(isDataValid)
+    }, [])
+
+    useEffect(() => {
+        setValid(isDataValid)
+    }, [bankDetails])
 
     const updateBankDetails = async () => {
         setIsLoading(true);
+        Keyboard.dismiss();
         try {
             const data = await patch(bankDetails, 'patchDriver');
             if (data) {
-                console.log(data);
+                setSnackBarText('Bank Details Updated')
+                setVisible(true)
                 setIsLoading(false);
-                
+                setValid(false)
+
             }
         } catch (error) {
-            console.log(error);
+            console.log('updateBankDetails',error);
             setIsLoading(false);
         }
 
 
     }
 
-    const setDriverLocally=async(id)=>{
+    const setDriverLocally = async (id) => {
         setIsLoading(true)
-        const queryParameter = '?driverId='+id.toString()
+        const queryParameter = '?driverId=' + id.toString()
         try {
-            const data = await get('getDriver',queryParameter);
+            const data = await get('getDriver', queryParameter);
             if (data) {
                 setBankDetails({
-                    id:globalData?.driverId,
+                    id: globalData?.driverId,
                     accountHolderName: data[0].accountHolderName,
                     bankName: data[0].bankName,
-                    accountNumber: data[0].accountNumber,
+                    accountNumber: data[0].accountNumber == 0 ? '' : data[0].accountNumber,
                     branchName: data[0].branchName,
                     swiftCode: data[0].swiftCode,
                     bankLocation: data[0].bankLocation,
-                    accountType: data[0].accountType
+                    accountType: data[0].accountType == '' ? accountType : data[0].accountType
                 })
                 setIsLoading(false);
-                setValid(isDataValid);
+
             }
         } catch (error) {
             console.log(error);
@@ -87,25 +95,24 @@ const BankDetails = () => {
                     ...bankDetails,
                     [type]: text.replace(/[^0-9]/g, '')
                 });
-            }else{
+            } else {
                 setBankDetails({
                     ...bankDetails,
                     [type]: text
                 });
             }
-           
+
         }
 
 
-       
+
 
     }
 
-    const isDataValid = (data) => {
+    const isDataValid = () => {
         let isValid = true;
         for (let item in bankDetails) {
             if (bankDetails[item] == '') {
-                console.log(bankDetails[item] );
                 isValid = false;
             }
         }
@@ -117,7 +124,7 @@ const BankDetails = () => {
     return (
         <ScrollView automaticallyAdjustKeyboardInsets={true} style={style.container}>
             <Provider>
-                {isLoading && <AppLoader styles={{top:'40%'}}/>}
+                {isLoading && <AppLoader styles={{ top: '40%' }} />}
                 <View style={style.mainContainer} onPress={Keyboard.dismiss}>
                     <View>
                         <Text style={[style.subHeaderText]} >Account Information: </Text>
@@ -175,9 +182,9 @@ const BankDetails = () => {
                         <Text style={style.noteText}>*By adding this bank account, I agree to T&Cs regarding topping up from bank account..</Text>
                     </View>
 
-                    <TouchableOpacity disabled={!valid}  style={[style.signInButton, !valid ? style.signInButtonDisabled : {}]} onPress={updateBankDetails}>
+                    <TouchableOpacity disabled={!valid} style={[style.signInButton, !valid ? style.signInButtonDisabled : {}]} onPress={updateBankDetails}>
                         <View style={{ width: 30 }} />
-                        <Text style={style.signInText} >{bankDetails.accountNumber.length==0 ? 'Add Bank Account':'Update Bank Account'}
+                        <Text style={style.signInText} >{bankDetails.accountNumber.length == 0 ? 'Add Bank Account' : 'Update Bank Account'}
                         </Text>
                         <View style={{ width: 30 }}>
                             {isLoading && <ActivityIndicator animating={true} color={'#fff'} />}

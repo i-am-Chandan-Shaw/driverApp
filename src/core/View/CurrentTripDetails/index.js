@@ -6,20 +6,15 @@ import MatIcons from 'react-native-vector-icons/MaterialIcons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import style from './style';
 import { useNavigation } from '@react-navigation/native';
-const CurrentTripDetails = ({ data,startTrip, endTrip, userData }) => {
+const CurrentTripDetails = ({ data,startTrip, endTrip, tripData,isStarted, isEnded }) => {
     const callDriver = () => {
-        Linking.openURL(`tel:${data.driverNumber}`)
+        Linking.openURL(`tel:${tripData?.userPhone}`)
     }
 
     const navigation = useNavigation();
 
     const SCREEN_WIDTH = Dimensions.get('window').width;
-
     const [sliderValue, setSliderValue] = useState(0);
-    const [tripStatus, setTripStatus]= useState({
-        isStarted:false,
-        isEnded:false
-    });
     const panResponder = PanResponder.create({
         onStartShouldSetPanResponder: () => true,
         onPanResponderMove: (evt, gestureState) => {
@@ -33,17 +28,13 @@ const CurrentTripDetails = ({ data,startTrip, endTrip, userData }) => {
                 // Go back to 0% if dragged less than or equal to 80%
                 setSliderValue(0);
             } else {
-                if(!tripStatus.isStarted){
-                    setTripStatus((status)=>{
-                        status.isStarted=true
-                        return status
-                    })
+                if(!isStarted){
                     startTrip()
                     setSliderValue(0);
                 }else{
                     console.log('end trip');
                     endTrip();
-                    navigation.navigate('RatingScreen', { user: userData })
+                    navigation.navigate('RatingScreen', { tripDetails: tripData })
                 }
             }
         },
@@ -57,7 +48,7 @@ const CurrentTripDetails = ({ data,startTrip, endTrip, userData }) => {
                     <View style={{ marginRight: 15 }}></View>
                     <Avatar.Text size={34} label="AK" />
                     <View style={{ marginRight: 10 }}></View>
-                    <Text style={{ fontSize: 16, color: '#000' }}>{userData?.name} ,</Text>
+                    <Text style={{ fontSize: 16, color: '#000' }}>{tripData?.userName} ,</Text>
                     <View style={{ marginRight: 20 }}></View>
                     <Text style={{ fontSize: 16, color: '#000' }}>4.3 </Text>
                     <FAIcons name='star' color='#f4c430' size={13} />
@@ -69,17 +60,17 @@ const CurrentTripDetails = ({ data,startTrip, endTrip, userData }) => {
                 </Pressable>
             </View>
              <View style={style.bottomContainer}>
-                <View style={[style.slider, {backgroundColor: tripStatus.isStarted?'#B31312':'#4773fa'}]}>
-                    <View style={[style.track, { width: `${(sliderValue) * 100}%`, backgroundColor: tripStatus.isStarted?'#B31312':'#4773fa' }]} >
+                <View style={[style.slider, {backgroundColor: isStarted?'#B31312':'#4773fa'}]}>
+                    <View style={[style.track, { width: `${(sliderValue) * 100}%`, backgroundColor: isStarted?'#B31312':'#4773fa' }]} >
                     </View>
                     <View
                         {...panResponder.panHandlers}
                         style={[style.thumb, { left: `${sliderValue * 100}%` }]}
                     >
-                        <MatIcons name='arrow-forward-ios' color={tripStatus.isStarted?'#B31312':'#4773fa'} size={20} />
+                        <MatIcons name='arrow-forward-ios' color={isStarted?'#B31312':'#4773fa'} size={20} />
                     </View>
                      <Text  style={[style.sliderText, { left: `${(sliderValue * 100)+ 30}%`, opacity: 1 - sliderValue}]}>
-                        {tripStatus.isStarted?'Swipe to end trip':'Swipe to start trip'}
+                        {isStarted?'Swipe to end trip':'Swipe to start trip'}
                     </Text>
                 </View>
             </View>

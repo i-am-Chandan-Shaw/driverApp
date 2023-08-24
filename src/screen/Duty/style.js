@@ -40,13 +40,13 @@ const style = StyleSheet.create({
       marginTop: 5
    },
    cardsContainer: {
-      paddingTop:70,
+      paddingTop: 70,
       position: 'absolute',
-      height:height,
+      height: height,
       zIndex: 10,
       backgroundColor: 'rgba(0,0,0,0.5)',
       padding: 10,
-      width:width
+      width: width
    },
    image: {
       height: 376,
@@ -63,8 +63,27 @@ const style = StyleSheet.create({
       color: '#000',
       fontFamily: "Poppins-SemiBold",
    },
+   navContainer: {
+      padding: 10,
+      paddingHorizontal: 12,
+      margin: 10,
+      position: 'absolute',
+      zIndex: 100,
+      width: '95%',
+      alignSelf: 'center',
+      flexDirection: 'row',
+      backgroundColor: 'rgba(0, 128, 0,1)',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      borderRadius: 8
+   },
+   viewButton: {
+      backgroundColor: '#fff',
+      paddingVertical: 5,
+      paddingHorizontal: 10,
+      borderRadius: 5
+   }
 
-  
 
 });
 

@@ -26,7 +26,6 @@ const Navigation = () => {
   const { globalData, setGlobalData } = useContext(AppContext)
   useEffect(() => {
     getDataFromStorage('driverId');
-    getDataFromStorage('driverData');
   }, []);
 
   const getDataFromStorage = async (key) => {
@@ -34,6 +33,9 @@ const Navigation = () => {
       const value = await AsyncStorage.getItem(key);
       if (value !== null) {
         setGlobalData(key, JSON.parse(value));
+        if(key=='driverId'){
+          setDriverLocally(value)
+        }
       } else {
         console.log(key, 'Data not found!');
         return false
@@ -43,6 +45,30 @@ const Navigation = () => {
       return false
     }
   }
+
+  const setDataToLocalStorage = async(key,data)=>{
+    try {
+      await AsyncStorage.setItem(key, JSON.stringify(data));;
+      console.log('Data saved successfully!');
+    } catch (error) {
+      console.log('Error retrieving data:', error);
+      return false
+    }
+  }
+
+  const setDriverLocally = async (id) => {
+    const queryParameter = '?driverId=' + id.toString()
+    try {
+        const data = await get('getDriver', queryParameter);
+        if (data) {
+          setGlobalData('driverData', JSON.parse(data));
+          setDataToLocalStorage('driverData',data)
+        }
+    } catch (error) {
+        console.log(error);
+        getDataFromStorage('driverData');
+    }
+}
 
 
   return (
