@@ -12,7 +12,7 @@ import { REACT_APP_MAPS_API } from '@env';
 import CustomMarker from '../../core/component/CustomMarker';
 import IonicIcon from 'react-native-vector-icons/Ionicons'
 import { Button } from 'react-native-paper';
-import notifee,{ AndroidStyle } from '@notifee/react-native';
+
 import LocationAccess from '../LocationAccess';
 
 
@@ -82,25 +82,7 @@ const Dashboard = () => {
         return () => clearInterval(interval)
     }
 
-    // const displayNotification=async()=>{
-    //     const channelId = await notifee.createChannel({
-    //         id: 'default',
-    //         name: 'Default Channel',
-    //       });
-    //     await notifee.displayNotification({
-    //         title: 'Driver Waiting',
-    //         body: 'Main body content of the notification',
-    //         android: {
-    //           channelId,
-    //           style: { type: AndroidStyle.BIGTEXT, text: 'Large volume of text shown in the expanded state Large volume of text shown in the expanded stateLarge volume of text shown in the expanded stateLarge volume of text shown in the expanded stateLarge volume of text shown in the expanded stateLarge volume of text shown in the expanded state' },
-    //           smallIcon: 'location', // optional, defaults to 'ic_launcher'.
-    //           // pressAction is needed if you want the notification to open the app when pressed
-    //           pressAction: {
-    //             id: 'default',
-    //           },
-    //         },
-    //       });
-    // }
+    
 
     const getLiveLocation = async () => {
         try {

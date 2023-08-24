@@ -23,7 +23,7 @@ const CurrentTripDetails = ({ data,startTrip, endTrip, userData }) => {
     const panResponder = PanResponder.create({
         onStartShouldSetPanResponder: () => true,
         onPanResponderMove: (evt, gestureState) => {
-            let value = gestureState.moveX / SCREEN_WIDTH * 0.75;
+            let value = gestureState.moveX / SCREEN_WIDTH * 0.79;
             value = Math.min(1, Math.max(0, value)); // Clamp the value between 0 and 1
             setSliderValue(value);
             

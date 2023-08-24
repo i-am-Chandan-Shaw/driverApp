@@ -10,10 +10,6 @@ import AppLoader from '../../core/component/AppLoader';
 
 const BankDetails = () => {
     const { globalData, setGlobalData } = useContext(AppContext)
-    useEffect(() => {
-        console.log(globalData);
-        setDriverLocally(globalData?.driverId)
-    }, [globalData])
 
     const [accountType, setAccountType] = useState('saving');
     const [visible, setVisible] = useState(false);
@@ -32,8 +28,8 @@ const BankDetails = () => {
     });
 
     useEffect(()=>{
-        setValid(isDataValid);
-    },[bankDetails])
+        setDriverLocally(globalData?.driverId)
+    },[])
 
     const updateBankDetails = async () => {
         setIsLoading(true);
@@ -109,6 +105,7 @@ const BankDetails = () => {
         let isValid = true;
         for (let item in bankDetails) {
             if (bankDetails[item] == '') {
+                console.log(bankDetails[item] );
                 isValid = false;
             }
         }

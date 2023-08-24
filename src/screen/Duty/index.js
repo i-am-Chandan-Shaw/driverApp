@@ -7,8 +7,9 @@ import imagePath from '../../constants/imagePath';
 import style from './style';
 import CustomMarker from '../../core/component/CustomMarker';
 import AppSwitch from '../../core/component/AppSwitch';
-import { get, post } from '../../core/helper/services';
+import { get, patch, post } from '../../core/helper/services';
 import TripCard from '../../core/component/TripCard';
+import notifee,{ AndroidStyle } from '@notifee/react-native';
 
 
 const { width, height } = Dimensions.get('window');
@@ -23,13 +24,20 @@ const Duty = () => {
     const [isDutyOn, setDuty] = useState(false);
     const [currentAddress, setCurrentAddress] = useState('Unknown')
     const [currentLocation, setCurrentLocation] = useState(null);
-    const [availableTrips, setAvailableTrips] = useState([])
+    const [availableTrips, setAvailableTrips] = useState([]);
+    const [value, setValue] = useState(1);
     const mapRef = useRef();
     let timeout;
 
     useEffect(() => {
         getUserLocation(false);
     }, []);
+
+    const changeValue = () => {
+        setValue((prev) => {
+            return prev + 1
+        })
+    }
 
 
 
@@ -39,9 +47,8 @@ const Duty = () => {
         } else {
             setAvailableTrips([])
             setUserData([]);
-            console.log('exited');
         }
-    }, [isDutyOn])
+    }, [isDutyOn, value])
 
     const findTrips = () => {
         timeout = setTimeout(() => {
@@ -52,6 +59,7 @@ const Duty = () => {
 
     const toggleSwitch = () => {
         setDuty((previousState) => {
+            clearTimeout(timeout)
             return !previousState;
         });
     }
@@ -63,22 +71,18 @@ const Duty = () => {
                 "lng": currentLocation?.longitude
             }
         }
-        
+
         try {
             const data = await post(driverCoords, 'getAvailableRides');
             if (data) {
-                console.log(data);
                 setUserDetails(data);
                 setAvailableTrips(data);
-                clearTimeout(timeout)
+                clearTimeout(timeout);
+                displayNotification();
             }
         } catch (error) {
-            console.log('getActiveRides=>',error);
-            console.log(isDutyOn);
-            if(isDutyOn)
-            {
-                findTrips();
-            }
+            console.log('getActiveRides=>', error);
+            changeValue()
         }
     }
 
@@ -128,9 +132,9 @@ const Duty = () => {
                 setUserData((prevData) => {
                     return [...prevData, data[0]]
                 })
-            } 
+            }
         } catch (error) {
-            console.log('getUserDetails',error);
+            console.log('getUserDetails', error);
         }
     }
 
@@ -159,7 +163,30 @@ const Duty = () => {
         setUserData(data);
         if (type == 'declined') {
             findTrips();
+        } else if (type == 'accepted') {
+            setDuty(false)
         }
+    }
+
+    const displayNotification=async()=>{
+        const channelId = await notifee.createChannel({
+            id: 'default',
+            name: 'Default Channel',
+          });
+        await notifee.displayNotification({
+            title: 'New rides are in!',
+            body: 'Main body content of the notification',
+            android: {
+              channelId,
+              style: { type: AndroidStyle.BIGTEXT, text: 'Open the app to start driving. Let\'s hit the road! 🚗' },
+              smallIcon: 'location', // optional, defaults to 'ic_launcher'.
+              // pressAction is needed if you want the notification to open the app when pressed
+              pressAction: {
+                id: 'default',
+                title:'Start'
+              },
+            },
+          });
     }
 
 

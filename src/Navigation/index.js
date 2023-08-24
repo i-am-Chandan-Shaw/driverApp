@@ -18,6 +18,7 @@ import { AppContext } from '../core/helper/AppContext';
 import LiveTracking from '../screen/LiveTracking';
 import RatingScreen from '../screen/RatingScreen';
 import { get } from '../core/helper/services';
+import TermsAndConditions from '../screen/TermsAndConditions';
 
 const Stack = createNativeStackNavigator();
 
@@ -52,6 +53,7 @@ const Navigation = () => {
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="LiveTracking" component={LiveTracking} />
         <Stack.Screen name="BankDetails" options={{ headerShown: true, title: 'Bank Details' }} component={BankDetails} />
+        <Stack.Screen name="TermsAndConditions" options={{ headerShown: true, title: 'Terms & Conditions' }} component={TermsAndConditions} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="BookingScreen" component={BookingScreen} />
         <Stack.Screen name="ChooseLocation" component={ChooseLocation} />
