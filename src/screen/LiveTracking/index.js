@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, } from 'react';
+import React, { useState, useRef, useEffect, useContext, } from 'react';
 import { View, Dimensions, Text, Pressable, Image, Linking, BackHandler } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MapView, { Marker } from 'react-native-maps';
@@ -15,6 +15,7 @@ import { patch } from '../../core/helper/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import OtpValidator from '../../core/component/OtpValidator';
 import AppLoader from '../../core/component/AppLoader';
+import { AppContext } from '../../core/helper/AppContext';
 
 
 const GOOGLE_MAPS_API_KEY = REACT_APP_MAPS_API;
@@ -25,16 +26,19 @@ const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 
 
+
 const LiveTracking = (props) => {
 
     const bottomSheetRef = useRef(null);
     const mapRef = useRef();
     const [snapPoints, setSnapPoints] = useState([175])
     const [coordinates, setCoordinates] = useState('');
+    const [receivedCoords,setReceivedCoords]=useState(null)
     const [tripData, setTripData] = useState(null);
     const navigation = useNavigation();
     const [showOtpModal, setShowOtpModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const { globalData, setGlobalData } = useContext(AppContext);
     const [tripStatus, setTripStatus] = useState({
         isStarted: false,
         isEnded: false
@@ -47,13 +51,22 @@ const LiveTracking = (props) => {
 
     useEffect(() => {
         bottomSheetRef.current?.present();
-        // console.log(props.route.params.coordinates);
+        console.log("====>", props.route.params.coordinates);
         // console.log(props.route.params.tripData);
-        setCoordinates(props.route.params.coordinates);
+        setReceivedCoords(props.route.params.coordinates);
         setTripData(props.route.params.tripData);
+        
         console.log('tripdsds', props.route.params.tripData);
 
     }, []);
+
+    useEffect(()=>{
+        setCoordinates({
+            pickupCoords:globalData.currentLocation,
+            dropCoords:receivedCoords?.pickupCoords,
+            drop:'Pickup Location'
+        })
+    },[receivedCoords])
 
     useEffect(() => {
         if (tripData?.status == 4) {
@@ -73,7 +86,12 @@ const LiveTracking = (props) => {
         console.log(value);
         setShowOtpModal(false)
         if (value == 'accepted') {
-            setIsLoading(true)
+            setIsLoading(true);
+            setCoordinates({
+                pickupCoords:globalData.currentLocation,
+                dropCoords:receivedCoords?.dropCoords,
+                drop:'Pickup Location'
+            })
             const payload = {
                 id: tripData?.tripId,
                 status: 4
@@ -209,7 +227,7 @@ const LiveTracking = (props) => {
                         toolbarEnabled={false}
                         loadingEnabled={false}
                         showsUserLocation={false}
-                        mapType={'terrain'}
+                        mapType={'standard'}
                         showsMyLocationButton={false} >
 
                         <Marker
@@ -238,7 +256,7 @@ const LiveTracking = (props) => {
                             optimizeWaypoints={true}
                             onReady={result => {
                                 mapRef.current.fitToCoordinates(result.coordinates, {
-                                    edgePadding: { top: 50, right: 20, bottom: 10, left: 30 },
+                                    edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
                                     animated: true,
                                 });
                                 setMapCoords(result.coordinates)
@@ -249,9 +267,9 @@ const LiveTracking = (props) => {
                     <View style={style.bottomContainer}>
 
                         <View style={style.navContainer}>
-                            <Text style={{ fontSize: 15, color: '#fff' }}>Open Google Maps for better navigation !</Text>
+                            <Text style={{ fontSize: 13, color: '#fff' }}>Open Google Maps for better navigation !</Text>
                             <Pressable style={style.viewButton} onPress={openGoogleMap}>
-                                <Text style={{ fontSize: 13, fontWeight: '500', color: '#000' }}>Open</Text>
+                                <Text style={{ fontSize: 12, fontWeight: '500', color: '#000' }}>Open</Text>
                             </Pressable>
                         </View>
                     </View>

@@ -4,7 +4,7 @@ import style from './style';
 import { ActivityIndicator, Avatar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { AppContext } from '../../helper/AppContext';
-import { patch } from '../../helper/services';
+import { get, patch } from '../../helper/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TripCard = ({ cardData, sendData, userData }) => {
@@ -44,32 +44,55 @@ const TripCard = ({ cardData, sendData, userData }) => {
     const acceptRide = async (trip) => {
         storeTripId(trip.tripId)
         setIsLoading(true)
-        const payload = {
-            id: trip.tripId,
-            status: 2,
-            driverId:globalData.driverId
-        }
         try {
-            const data = await patch(payload, 'patchRequestVehicle');
-            if (data) {
-                const updatedData = []
-                sendData(updatedData, 'accepted');
-                trackLive(trip);
-                setIsLoading(false)
+            trip = await getUpdatedTripDetails(trip.tripId);
+            if (trip) {
+                const payload = {
+                    id: trip.tripId,
+                    status: 2,
+                    driverId: globalData.driverId
+                }
+                try {
+                    const data = await patch(payload, 'patchRequestVehicle');
+                    if (data) {
+                        const updatedData = []
+                        sendData(updatedData, 'accepted');
+                        trackLive(trip);
+                        setIsLoading(false)
+                    }
+                } catch (error) {
+                    console.log(error);
+                    setIsLoading(false)
+
+                }
             }
         } catch (error) {
-            console.log(error);
+            console.log('acceptRide error===>', error);
+            setIsLoading(false)
+        }
 
+    }
+
+    const getUpdatedTripDetails = async (id) => {
+        const queryParameter = '?tripId=' + id.toString()
+        try {
+            const data = await get('getRequestVehicle', queryParameter);
+            if (data) {
+                return data[0]
+            }
+        } catch (error) {
+            console.log('getTripStatus', error);
+            setIsLoading(false);
         }
     }
 
 
     const trackLive = (trip) => {
         if (trip) {
-            const startLatitude = trip.pickUpCoords.pickUpLat; 
-            const startLongitude = trip.pickUpCoords.pickUpLng; 
-            const destinationLatitude = trip.dropCoords.dropLat;  
-            const destinationLongitude = trip.dropCoords.dropLng; 
+            const startLatitude = trip.pickUpCoords.pickUpLat;
+            const startLongitude = trip.pickUpCoords.pickUpLng;
+            const destinationLatitude = trip.dropCoords.dropLat;
+            const destinationLongitude = trip.dropCoords.dropLng;
             const LATITUDE_DELTA = 0.0122
             const LONGITUDE_DELTA = 0.0061627689429373245
 
@@ -89,6 +112,7 @@ const TripCard = ({ cardData, sendData, userData }) => {
                     "longitudeDelta": LATITUDE_DELTA
                 },
 
+
             }
 
             navigation.navigate('LiveTracking', { coordinates: data, tripData: trip })
@@ -100,6 +124,10 @@ const TripCard = ({ cardData, sendData, userData }) => {
     const storeTripId = async (id) => {
         try {
             await AsyncStorage.setItem('tripId', id.toString());
+            let driver = await AsyncStorage.getItem('driverId');
+            if (driver) {
+                console.log(driver);
+            }
             console.log('Data saved successfully!');
         } catch (error) {
             console.log('Error saving data:', error);

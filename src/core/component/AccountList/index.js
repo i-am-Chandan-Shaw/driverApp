@@ -55,6 +55,10 @@ const AccountList = () => {
       navigation.navigate('Verification')
     }
 
+    const openTermsAndCondition=()=>{
+      navigation.navigate('TermsAndConditions')
+    }
+
     const openBankDetailsScreen = ()=>{
       navigation.navigate('BankDetails')
     }
@@ -122,7 +126,8 @@ const AccountList = () => {
             buttonText: '',
             buttonType: '',
             buttonColor: '',
-            nextPage:true
+            nextPage:true,
+            onPress:openTermsAndCondition
         },
         {
         id: 4,

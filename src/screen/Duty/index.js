@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Linking, Dimensions, Image, Text, TouchableOpacity, Pressable } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { View, Linking, Dimensions, Image, Text, TouchableOpacity, Pressable, AppState } from 'react-native';
 import { getAddressFromCoordinates, getCurrentLocation, locationPermission } from '../../core/helper/helper';
 import MapView, { Marker, Circle } from 'react-native-maps';
 import LocationAccess from '../LocationAccess';
@@ -13,6 +13,8 @@ import notifee, { AndroidStyle } from '@notifee/react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppLoader from '../../core/component/AppLoader';
+import { AppContext } from '../../core/helper/AppContext';
+
 
 
 const { width, height } = Dimensions.get('window');
@@ -29,13 +31,16 @@ const Duty = () => {
     const [availableTrips, setAvailableTrips] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isRideActive, setIsRideActive] = useState(false);
-    const [activeRideData,setActiveRideData]=useState(null)
+    const [activeRideData, setActiveRideData] = useState(null);
+    const { globalData, setGlobalData } = useContext(AppContext);
     const [value, setValue] = useState(1);
     const navigation = useNavigation();
+    const [appState, setAppState] = useState(AppState.currentState);
+
 
     const mapRef = useRef();
     let timeout;
-    let waitForTripStatus
+    var waitForTripStatus;
 
     useEffect(() => {
         getUserLocation(false);
@@ -44,6 +49,35 @@ const Duty = () => {
         // trackLive()
         getTripId();
     }, []);
+
+    // Handling app state change
+
+    useEffect(() => {
+        const handleAppStateChange = (nextAppState) => {
+            // Update the state variable with the current app state
+            setAppState(nextAppState);
+
+            if (nextAppState === 'background') {
+                // The app has gone into the background
+                console.log('App is in the background');
+            } else if (nextAppState === 'active') {
+                // The app is back in the foreground
+                console.log('App is in the foreground');
+            }
+        };
+
+        // Subscribe to app state changes
+        const subscription = AppState.addEventListener(
+            'change',
+            handleAppStateChange
+        );
+
+        // Clean up the subscription when the component unmounts
+        return () => {
+            subscription.remove();
+        };
+    }, []);
+
 
 
 
@@ -64,7 +98,7 @@ const Duty = () => {
                 if (data[0].status != 2 && data[0].status != 4) {
                     clearInterval(waitForTripStatus);
                     setIsRideActive(false)
-                }else{
+                } else {
                     setIsRideActive(true);
                 }
                 setIsLoading(false);
@@ -100,6 +134,7 @@ const Duty = () => {
     const trackLive = () => {
         let trip = activeRideData;
         if (trip) {
+
             const startLatitude = trip.pickUpCoords.pickUpLat;
             const startLongitude = trip.pickUpCoords.pickUpLng;
             const destinationLatitude = trip.dropCoords.dropLat;
@@ -125,6 +160,7 @@ const Duty = () => {
 
             }
 
+            clearInterval(waitForTripStatus);
             navigation.navigate('LiveTracking', { coordinates: data, tripData: trip })
         }
 
@@ -144,7 +180,7 @@ const Duty = () => {
     const findTrips = () => {
         timeout = setTimeout(() => {
             getActiveRides();
-        }, 3000);
+        }, 6000);
 
     }
 
@@ -166,6 +202,7 @@ const Duty = () => {
         try {
             const data = await post(driverCoords, 'getAvailableRides');
             if (data) {
+                displayNotification()
                 console.log(data);
                 setAvailableTrips(data);
                 clearTimeout(timeout);
@@ -192,12 +229,15 @@ const Duty = () => {
                 }
                 // animate(latitude, longitude);
                 setCurrentLocation(() => {
-                    return ({
+                    let coords = {
                         latitude: latitude,
                         longitude: longitude,
                         latitudeDelta: LATITUDE_DELTA,
                         longitudeDelta: LONGITUDE_DELTA,
-                    })
+                    }
+
+                    setGlobalData('currentLocation', coords)
+                    return (coords)
                 })
             }
         } catch (error) {
@@ -243,7 +283,7 @@ const Duty = () => {
             body: 'Open the app to start driving. Let\'s hit the road! 🚗',
             android: {
                 channelId,
-                style: { type: AndroidStyle.BIGTEXT, text: '' },
+                style: { type: AndroidStyle.BIGTEXT, text: 'Open the app to start driving. Let\'s hit the road! 🚗' },
                 smallIcon: 'location', // optional, defaults to 'ic_launcher'.
                 // pressAction is needed if you want the notification to open the app when pressed
                 pressAction: {
@@ -267,7 +307,7 @@ const Duty = () => {
                 {!isRideActive && <View style={style.dutyContainer}>
                     <AppSwitch toggleSwitch={toggleSwitch} />
                 </View>}
-                {isLoading && <AppLoader styles={{top:300}} />}
+                {isLoading && <AppLoader styles={{ top: 300 }} />}
                 {!isDutyOn && <View style={style.waitingContainer}>
                     <Image style={style.image} source={imagePath.van} />
                     <Text style={style.mediumText}>Go ON DUTY to start earning !</Text>

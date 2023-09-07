@@ -9,7 +9,7 @@ const style = StyleSheet.create({
    },
    mapContainer: {
       width: '100%',
-      height: height
+      height: height - 185
    },
    header: {
       position: 'absolute',
