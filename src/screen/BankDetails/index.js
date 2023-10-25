@@ -186,9 +186,6 @@ const BankDetails = () => {
                         <View style={{ width: 30 }} />
                         <Text style={style.signInText} >{bankDetails.accountNumber.length == 0 ? 'Add Bank Account' : 'Update Bank Account'}
                         </Text>
-                        <View style={{ width: 30 }}>
-                            {isLoading && <ActivityIndicator animating={true} color={'#fff'} />}
-                        </View>
                     </TouchableOpacity>
                     <Snackbar
                         style={style.snackBar}

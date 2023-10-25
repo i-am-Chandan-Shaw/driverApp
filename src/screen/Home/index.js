@@ -1,6 +1,5 @@
 import React from "react";
 import { Provider as PaperProvider, BottomNavigation } from 'react-native-paper';
-import Dashboard from "../Dashboard";
 import Account from "../Account";
 import Incentive from "../Incentive";
 import Earnings from "../Earnings";

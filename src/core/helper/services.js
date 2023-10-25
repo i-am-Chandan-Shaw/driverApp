@@ -11,6 +11,7 @@ export const post = (payload, type) => new Promise((resolve, reject) => {
     };
     fetch(apiString + type + '.php', requestOptions)
         .then(response => {
+            console.log(payload,response);
             if (response.ok) {
                 // If the response is OK
                 response.json()
@@ -36,6 +37,7 @@ export const patch = (payload, reqType) => new Promise((resolve, reject) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     };
+    console.log(JSON.stringify(payload));
     fetch(apiString + reqType + '.php', requestOptions)
         .then(response => {
             response.json()

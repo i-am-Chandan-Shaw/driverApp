@@ -4,7 +4,7 @@ import style from './style';;
 import AppTextInput from '../../core/component/AppTextInput';
 import { Picker } from '@react-native-picker/picker';
 import { Snackbar, Provider,ActivityIndicator } from 'react-native-paper';
-import { post } from '../../core/helper/services';
+import { post,get } from '../../core/helper/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppContext } from '../../core/helper/AppContext';
 
@@ -44,24 +44,19 @@ const Register = ({route, navigation }) => {
 
     const registerUser = async () => {
         setIsLoading(true);
+        console.log(registeredData);
         try {
             const data = await post(registeredData,'registerDriver');
             if (data) {
                 setIsLoading(false);
                 setDriverLocally(data.id);
-                setGlobalData({
-                    driverId:data.id,
-                    ...globalData
-                  });
-                showAlert(data)
-                
+                setDriverDataLocally(data.id)
+                setGlobalData('driverId', data.id);
             }
         } catch (error) {
             console.log(error);
             setIsLoading(false);
         }
-
-        
     }
 
     useEffect(()=>{
@@ -83,6 +78,20 @@ const Register = ({route, navigation }) => {
             console.log('Data saved successfully!');
         } catch (error) {
             console.log('Error saving data:', error);
+        }
+    }
+
+    const setDriverDataLocally=async(id)=>{
+        const queryParameter = '?driverId='+id.toString()
+        try {
+            const data = await get('getDriver',queryParameter);
+            if (data) {
+                await AsyncStorage.setItem('driverData', JSON.stringify(data));
+                setGlobalData('driverData', data);
+                showAlert(data)
+            }
+        } catch (error) {
+            console.log(error);
         }
     }
     

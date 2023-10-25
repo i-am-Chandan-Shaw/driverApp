@@ -1,7 +1,12 @@
 import { PermissionsAndroid, Platform } from "react-native";
 import Geolocation from "react-native-geolocation-service";
-import {REACT_APP_MAPS_API} from '@env';
+import { REACT_APP_MAPS_API } from '@env';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useContext } from "react";
+import { AppContext } from "./AppContext";
 const GOOGLE_MAPS_API_KEY = REACT_APP_MAPS_API;
+
+
 
 export const locationPermission = () => new Promise(async (resolve, reject) => {
     if (Platform.OS === 'ios') {
@@ -43,7 +48,7 @@ export const getCurrentLocation = () => new Promise((resolve, reject) => {
             resolve(cords);
         },
         error => {
-            reject('getCurrentLocation error',error.message)
+            reject('getCurrentLocation error', error.message)
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
     )
@@ -69,4 +74,14 @@ export const getAddressFromCoordinates = (latitude, longitude) => new Promise((r
         .catch(error => {
             reject(error);
         });
+});
+
+
+export const setDataLocally = (key, value) => new Promise(async (resolve, reject) => {
+    try {
+        await AsyncStorage.setItem(key.toString(), value.toString());
+        resolve('data saved successfully!');
+    } catch (error) {
+        console.log('Error saving data:', error);
+    }
 });

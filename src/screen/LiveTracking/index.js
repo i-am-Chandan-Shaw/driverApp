@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useContext, } from 'react';
-import { View, Dimensions, Text, Pressable, Image, Linking, BackHandler } from 'react-native';
+import { View, Dimensions, Text, Pressable, Image, Linking, BackHandler, Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MapView, { Marker } from 'react-native-maps';
 import { BottomSheetModal, BottomSheetModalProvider, TouchableOpacity } from '@gorhom/bottom-sheet';
@@ -11,11 +11,12 @@ import style from './style';
 import { Button } from 'react-native-paper';
 import CurrentTripDetails from '../../core/View/CurrentTripDetails';
 import { useNavigation } from '@react-navigation/native';
-import { patch } from '../../core/helper/services';
+import { get, patch } from '../../core/helper/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import OtpValidator from '../../core/component/OtpValidator';
 import AppLoader from '../../core/component/AppLoader';
 import { AppContext } from '../../core/helper/AppContext';
+import { getCurrentLocation, locationPermission } from '../../core/helper/helper';
 
 
 const GOOGLE_MAPS_API_KEY = REACT_APP_MAPS_API;
@@ -33,7 +34,7 @@ const LiveTracking = (props) => {
     const mapRef = useRef();
     const [snapPoints, setSnapPoints] = useState([175])
     const [coordinates, setCoordinates] = useState('');
-    const [receivedCoords,setReceivedCoords]=useState(null)
+    const [receivedCoords, setReceivedCoords] = useState(null)
     const [tripData, setTripData] = useState(null);
     const navigation = useNavigation();
     const [showOtpModal, setShowOtpModal] = useState(false);
@@ -42,31 +43,33 @@ const LiveTracking = (props) => {
     const [tripStatus, setTripStatus] = useState({
         isStarted: false,
         isEnded: false
-    })
+    });
+    let tripInterval;
 
 
     const [mapCoords, setMapCoords] = useState('');
 
-
+    const markerRef = useRef();
 
     useEffect(() => {
         bottomSheetRef.current?.present();
-        console.log("====>", props.route.params.coordinates);
-        // console.log(props.route.params.tripData);
         setReceivedCoords(props.route.params.coordinates);
         setTripData(props.route.params.tripData);
-        
-        console.log('tripdsds', props.route.params.tripData);
+        let interval = setInterval(() => {
+            getLiveLocation();
+        }, 6000)
 
+        return () => clearInterval(interval);
     }, []);
 
-    useEffect(()=>{
+    useEffect(() => {
         setCoordinates({
-            pickupCoords:globalData.currentLocation,
-            dropCoords:receivedCoords?.pickupCoords,
-            drop:'Pickup Location'
+            pickupCoords: globalData.currentLocation,
+            dropCoords: receivedCoords?.pickupCoords,
+            drop: 'Pickup Location'
         })
-    },[receivedCoords])
+    }, [receivedCoords]);
+
 
     useEffect(() => {
         if (tripData?.status == 4) {
@@ -75,7 +78,77 @@ const LiveTracking = (props) => {
                 return prevStatus;
             });
         }
-    }, [tripData])
+        let tripInterval = setInterval(() => {
+            console.log('sasaa', tripData?.tripId)
+            getTripStatus(tripData?.tripId)
+
+        }, 6000);
+        return () => clearInterval(tripInterval);
+    }, [tripData]);
+
+    const getTripStatus = async (id) => {
+        const queryParameter = '?tripId=' + id.toString()
+        try {
+            const data = await get('getRequestVehicle', queryParameter);
+            if (data) {
+                if (data[0].status == 5) {
+                    clearInterval(tripInterval);
+                    navigation.replace('Rating', { tripData: coordinates, tripData: tripData });
+                }
+                else if (data[0].status > 5) {
+                    clearInterval(tripInterval);
+                    navigation.reset({
+                        index: 0,
+                        routes: [{ name: 'Home' }],
+                    });
+                }
+            }
+        } catch (error) {
+            console.log('getTripStatus', error);
+        }
+    }
+
+    const getLiveLocation = async () => {
+        try {
+            const status = await locationPermission()
+            if (status == 'granted') {
+                const { latitude, longitude } = await getCurrentLocation();
+                updateCurrentLoc(globalData?.driverData[0].id, latitude, longitude);
+                animate(latitude, longitude);
+
+            }
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
+
+    const updateCurrentLoc = async (driverId, lat, lng) => {
+        const payload = {
+            id: driverId,
+            lat: lat,
+            lng: lng
+        }
+        try {
+            const data = await patch(payload, 'patchDriver');
+            if (data) {
+                console.log(data);
+            }
+        } catch (error) {
+            console.log('update current doc error', error);
+        }
+    }
+
+    const animate = (latitude, longitude) => {
+        const newCoordinate = { latitude, longitude };
+        if (Platform.OS == 'android') {
+            if (markerRef.current) {
+                markerRef.current.animateMarkerToCoordinate(newCoordinate, 7000)
+            }
+        } else {
+            state.coordinate.timing(newCoordinate).start()
+        }
+    }
 
     const cancelRide = () => {
         // Linking.openURL(`tel:${tripData.phone}`)
@@ -83,14 +156,13 @@ const LiveTracking = (props) => {
     }
 
     const closingOTPModal = async (value) => {
-        console.log(value);
         setShowOtpModal(false)
         if (value == 'accepted') {
             setIsLoading(true);
             setCoordinates({
-                pickupCoords:globalData.currentLocation,
-                dropCoords:receivedCoords?.dropCoords,
-                drop:'Pickup Location'
+                pickupCoords: globalData.currentLocation,
+                dropCoords: receivedCoords?.dropCoords,
+                drop: 'Pickup Location'
             })
             const payload = {
                 id: tripData?.tripId,
@@ -238,13 +310,13 @@ const LiveTracking = (props) => {
                                 imgSrc={imagePath.dropMarker} />
                         </Marker>
 
-                        <Marker
+                        <Marker.Animated ref={markerRef}
                             coordinate={coordinates.pickupCoords}>
                             <CustomMarker
                                 headerText={''}
                                 text={null}
                                 imgSrc={imagePath.truck} />
-                        </Marker>
+                        </Marker.Animated>
 
 
                         <MapViewDirections

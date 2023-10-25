@@ -14,6 +14,8 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppLoader from '../../core/component/AppLoader';
 import { AppContext } from '../../core/helper/AppContext';
+import messaging from '@react-native-firebase/messaging';
+import AppTextInput from '../../core/component/AppTextInput';
 
 
 
@@ -38,17 +40,46 @@ const Duty = () => {
     const [appState, setAppState] = useState(AppState.currentState);
 
 
+
     const mapRef = useRef();
     let timeout;
-    var waitForTripStatus;
+    let waitForTripStatus;
 
     useEffect(() => {
         getUserLocation(false);
         // changeTripStatus();
-
+        getDeviceToken()
         // trackLive()
         getTripId();
     }, []);
+
+
+    const getDeviceToken = async () => {
+        try {
+            let token = await messaging().getToken();
+            if (token)
+                updatePushToken(token)
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const updatePushToken = async (token) => {
+        let payload = {
+            id: globalData?.driverData[0].id,
+            pushToken: token
+        }
+        try {
+            const data = await patch(payload, 'patchDriver');
+            if (data) {
+                console.log(data);
+            }
+        } catch (error) {
+            console.log('updatePushToken', error);
+        }
+
+
+    }
 
     // Handling app state change
 
@@ -105,6 +136,7 @@ const Duty = () => {
             }
         } catch (error) {
             console.log('getTripStatus', error);
+            clearInterval(waitForTripStatus)
             setIsLoading(false);
         }
     }
@@ -310,7 +342,7 @@ const Duty = () => {
                 {isLoading && <AppLoader styles={{ top: 300 }} />}
                 {!isDutyOn && <View style={style.waitingContainer}>
                     <Image style={style.image} source={imagePath.van} />
-                    <Text style={style.mediumText}>Go ON DUTY to start earning !</Text>
+                    <Text style={style.mediumText}>Go ON DUTY to start earning !  </Text>
                 </View>}
                 {/* On Duty */}
 

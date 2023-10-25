@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Image, Pressable, FlatList, Alert } from 'react-native';
 import { Button } from 'react-native-paper';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
@@ -249,6 +249,9 @@ const Verification = () => {
         rcBack:''
     })
 
+    useEffect(()=>{
+        console.log(pic)
+    },[pic])
 
 
     return (
