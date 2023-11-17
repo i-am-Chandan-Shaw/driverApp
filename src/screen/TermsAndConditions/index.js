@@ -3,7 +3,7 @@ import { WebView } from 'react-native-webview';
 
 const TermsAndConditions=()=>{
 return (
-    <WebView source={{ uri: 'https://loadgo.in/terms-conditions/' }} style={{ flex: 1 }} />
+    <WebView source={{ uri: 'https://rahul-shaw18.github.io/LoadGo/terms-conditions' }} style={{ flex: 1 }} />
     )
 }
 

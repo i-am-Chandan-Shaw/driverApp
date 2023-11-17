@@ -81,36 +81,6 @@ const Duty = () => {
 
     }
 
-    // Handling app state change
-
-    useEffect(() => {
-        const handleAppStateChange = (nextAppState) => {
-            // Update the state variable with the current app state
-            setAppState(nextAppState);
-
-            if (nextAppState === 'background') {
-                // The app has gone into the background
-                console.log('App is in the background');
-            } else if (nextAppState === 'active') {
-                // The app is back in the foreground
-                console.log('App is in the foreground');
-            }
-        };
-
-        // Subscribe to app state changes
-        const subscription = AppState.addEventListener(
-            'change',
-            handleAppStateChange
-        );
-
-        // Clean up the subscription when the component unmounts
-        return () => {
-            subscription.remove();
-        };
-    }, []);
-
-
-
 
     const changeValue = () => {
         setValue((prev) => {
@@ -147,7 +117,6 @@ const Duty = () => {
             const id = await AsyncStorage.getItem('tripId');
             if (id !== null) {
                 waitForTripStatus = setInterval(() => {
-                    console.log('waiting');
                     checkForActiveTrip(id);
                 }, 3000)
             } else {
@@ -234,8 +203,6 @@ const Duty = () => {
         try {
             const data = await post(driverCoords, 'getAvailableRides');
             if (data) {
-                displayNotification()
-                console.log(data);
                 setAvailableTrips(data);
                 clearTimeout(timeout);
 

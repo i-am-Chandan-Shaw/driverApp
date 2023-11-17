@@ -79,7 +79,6 @@ const LiveTracking = (props) => {
             });
         }
         let tripInterval = setInterval(() => {
-            console.log('sasaa', tripData?.tripId)
             getTripStatus(tripData?.tripId)
 
         }, 6000);

@@ -33,7 +33,7 @@ const Navigation = () => {
       const value = await AsyncStorage.getItem(key);
       if (value !== null) {
         setGlobalData(key, JSON.parse(value));
-        if(key=='driverId'){
+        if (key == 'driverId') {
           setDriverLocally(value)
         }
       } else {
@@ -46,7 +46,7 @@ const Navigation = () => {
     }
   }
 
-  const setDataToLocalStorage = async(key,data)=>{
+  const setDataToLocalStorage = async (key, data) => {
     try {
       await AsyncStorage.setItem(key, JSON.stringify(data));;
       console.log('Data saved successfully!');
@@ -59,16 +59,16 @@ const Navigation = () => {
   const setDriverLocally = async (id) => {
     const queryParameter = '?driverId=' + id.toString()
     try {
-        const data = await get('getDriver', queryParameter);
-        if (data) {
-          setGlobalData('driverData', JSON.parse(data));
-          setDataToLocalStorage('driverData',data)
-        }
+      const data = await get('getDriver', queryParameter);
+      if (data) {
+        setGlobalData('driverData', JSON.parse(data));
+        setDataToLocalStorage('driverData', data)
+      }
     } catch (error) {
-        console.log(error);
-        getDataFromStorage('driverData');
+      console.log(error);
+      getDataFromStorage('driverData');
     }
-}
+  }
 
 
   return (
@@ -88,7 +88,11 @@ const Navigation = () => {
         <Stack.Screen name="RideHistory" options={{ headerShown: true, title: 'Orders' }} component={RideHistory} />
         <Stack.Screen name="Wallet" options={{ headerShown: true, title: 'Wallet' }} component={Wallet} />
         <Stack.Screen name="TripDetails" options={{ headerShown: true, title: 'Trip Details' }} component={TripDetails} />
-        <Stack.Screen name="Rating" component={RatingScreen} options={{ headerShown: true, title: 'Rating & Review' }} />
+        <Stack.Screen name="Rating" component={RatingScreen} options={{
+          headerShown: true, title: 'Rating & Review', headerLeft: () => {
+            return null;
+          }, title: 'Rating & Review'
+        }} />
       </Stack.Navigator>
     </NavigationContainer>
   )
