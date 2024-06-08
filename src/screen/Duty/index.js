@@ -15,8 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppLoader from '../../core/component/AppLoader';
 import { AppContext } from '../../core/helper/AppContext';
 import messaging from '@react-native-firebase/messaging';
-import AppTextInput from '../../core/component/AppTextInput';
-
+import { Snackbar } from 'react-native-paper';
 
 
 const { width, height } = Dimensions.get('window');
@@ -38,6 +37,13 @@ const Duty = () => {
     const [value, setValue] = useState(1);
     const navigation = useNavigation();
     const [appState, setAppState] = useState(AppState.currentState);
+    const [snackBarText, setSnackBarText] = useState('Oops !! Something went wrong.');
+    const [visible, setVisible] = useState(false);
+
+
+
+    const onDismissSnackBar = () => setVisible(false);
+
 
 
 
@@ -94,13 +100,13 @@ const Duty = () => {
 
             const data = await get('getRequestVehicle', queryParameter);
             if (data) {
-                console.log(data[0].status);
+                console.log(data,'==>',globalData.driverData[0].id);
                 setActiveRideData(data[0])
-                if (data[0].status != 2 && data[0].status != 4) {
+                if ((data[0].status == 2 || data[0].status == 4)&& globalData.driverData[0].id == data[0].driverId) {
+                    setIsRideActive(true);
+                } else {
                     clearInterval(waitForTripStatus);
                     setIsRideActive(false)
-                } else {
-                    setIsRideActive(true);
                 }
                 setIsLoading(false);
             }
@@ -194,6 +200,7 @@ const Duty = () => {
 
     const getActiveRides = async () => {
         let driverCoords = {
+            "id": globalData?.driverId,
             "driverCoordinates": {
                 "lat": currentLocation?.latitude,
                 "lng": currentLocation?.longitude
@@ -234,7 +241,6 @@ const Duty = () => {
                         latitudeDelta: LATITUDE_DELTA,
                         longitudeDelta: LONGITUDE_DELTA,
                     }
-
                     setGlobalData('currentLocation', coords)
                     return (coords)
                 })
@@ -246,7 +252,6 @@ const Duty = () => {
                 Linking.openSettings()
         }
     }
-
 
 
 
@@ -268,6 +273,14 @@ const Duty = () => {
     const updatedData = (data, type) => {
         setAvailableTrips(data);
         if (type == 'declined') {
+            findTrips();
+        } else if (type == 'invalid') {
+            setSnackBarText('Oops! Some other driver already accepted the request. Try the next trip !')
+            setVisible(true);
+            findTrips();
+        } else if (type == 'others') {
+            setSnackBarText('Oops ! Something went wrong.');
+            setVisible(true);
             findTrips();
         }
     }
@@ -333,7 +346,7 @@ const Duty = () => {
                     {currentLocation &&
                         <View>
                             <Circle center={currentLocation}
-                                radius={4000}
+                                radius={20000}
                                 strokeWidth={2}
                                 strokeColor={'#aaa'}
                                 fillColor='rgba(255,232,255,0.4)'
@@ -352,11 +365,28 @@ const Duty = () => {
 
                 </MapView>)}
 
+
+
                 {/* Center Button */}
                 {(currentLocation && isDutyOn) && <View style={style.bottomContainer}>
                     <TouchableOpacity style={style.onCenterContainer} onPress={onCenter} >
                         <Image source={imagePath.liveLocationBtn} />
                     </TouchableOpacity>
+                    <Snackbar
+                        style={style.snackBar}
+                        visible={visible}
+                        duration={4000}
+                        onDismiss={onDismissSnackBar}
+                        action={{
+                            label: 'OK',
+                            labelStyle: { color: '#fff' },
+                            onPress: () => {
+                                // Do something
+                            },
+                        }}
+                    >
+                        {snackBarText}
+                    </Snackbar>
                 </View>}
             </View>}
             {!locationAccessed && <LocationAccess onPress={getUserLocation} />}

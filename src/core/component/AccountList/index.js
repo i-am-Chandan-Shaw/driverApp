@@ -25,7 +25,7 @@ const AccountList = ({ driverData }) => {
     try {
       await AsyncStorage.setItem('isLoggedIn', 'false');
       console.log('Data saved successfully!');
-      navigation.navigate('Login')
+      navigation.replace('Login')
     } catch (error) {
       console.log('Error saving data:', error);
     }

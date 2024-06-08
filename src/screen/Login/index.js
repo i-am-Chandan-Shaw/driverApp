@@ -8,79 +8,89 @@ import {
 import React, { useState, useEffect, useContext } from "react";
 import AppTextInput from "../../core/component/AppTextInput";
 import style from "./style";
-import auth from '@react-native-firebase/auth';
 import { ActivityIndicator } from 'react-native-paper';
 import { Snackbar } from 'react-native-paper';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { get, post } from "../../core/helper/services";
 import { AppContext } from "../../core/helper/AppContext";
+import AppLoader from '../../core/component/AppLoader';
 
 
 const Login = ({ navigation }) => {
     const [phone, setPhone] = useState(null)
     const [valid, setValid] = useState(null)
-    const [count, setCount] = useState(120)
+    const [count, setCount] = useState(10)
     const [confirm, setConfirm] = useState(null);
     const [loading, setLoading] = useState(false);
     const [visible, setVisible] = useState(false);
     const [intervalId, setIntervalId] = useState(null);
-    const [isChecking, setIsChecking]= useState(false);
-    const { globalData, setGlobalData } = useContext(AppContext) 
-
+    const [isChecking, setIsChecking] = useState(false);
+    const { globalData, setGlobalData } = useContext(AppContext)
+    var id = null;
 
     const onToggleSnackBar = () => setVisible(!visible);
     const onDismissSnackBar = () => setVisible(false);
 
-    const handleResendOTP = () => {
-        if (!intervalId) {
-            const id = setInterval(() => {
-                setCount((count) => {
-                    count = count - 1
-                    if (count == 0) {
-                        clearInterval(id);
-                        setIntervalId(null);
-                    }
-                    if (count < 0) {
-                        return 120
-                    }
-                    return count;
-                });
+
+    const [timer, setTimer] = useState(60); // Initial timer value
+    const [isTimerRunning, setIsTimerRunning] = useState(false);
+
+    // Function to start the timer
+    const startTimer = () => {
+        setTimer(60);
+        setIsTimerRunning(true);
+    };
+
+    // Function to stop the timer
+    const stopTimer = () => {
+        setIsTimerRunning(false);
+    };
+
+    useEffect(() => {
+        let intervalId;
+
+        // Start the timer when isTimerRunning is true
+        if (isTimerRunning) {
+            intervalId = setInterval(() => {
+                setTimer(prevTimer => prevTimer - 1); // Decrease timer by 1 every second
             }, 1000);
+        } else {
+            clearInterval(intervalId); // Clear the interval when timer is not running
         }
 
+        // When timer reaches 0, stop the timer
+        if (timer === 0) {
+            stopTimer();
+        }
+
+        // Clean up function to clear interval when component unmounts
+        return () => clearInterval(intervalId);
+    }, [timer, isTimerRunning]);
+
+    const handleResendOTP = () => {
+        startTimer()
+
     };
+
     // verification code (OTP - One-Time-Passcode)
     const [code, setCode] = useState('');
 
-    // Handle login
-    function onAuthStateChanged(user) {
-        if (user) {
-            
-            // Some Android devices can automatically process the verification code (OTP) message, and the user would NOT need to enter the code.
-            // Actually, if he/she tries to enter it, he/she will get an error message because the code was already used in the background.
-            // In this function, make sure you hide the component(s) for entering the code and/or navigate away from this screen.
-            // It is also recommended to display a message to the user informing him/her that he/she has successfully logged in.
-        }
-        else{
-            
-        }
-    }
 
-    const checkAuthentication=async ()=>{
+    const checkAuthentication = async () => {
         setLoading(true)
-        let payload={ phone:phone }
+        let payload = { phone: phone }
         try {
-            const data = await post(payload,'driverLogin');
+            const data = await post(payload, 'driverLogin');
             if (data) {
-                if(data.isRegistered){
+                if (data.isRegistered) {
                     setLoading(false);
                     setAuthenticated(data.id);
                     setDriverLocally(data.id)
-                    setGlobalData('driverId',data.id);
+                    setGlobalData('driverId', data.id);
                     navigation.replace('Home');
-                }else{
-                    navigation.replace('Register',{phone:phone});
+                } else {
+                    navigation.replace('Register', { phone: phone });
                 }
             }
         } catch (error) {
@@ -105,10 +115,10 @@ const Login = ({ navigation }) => {
         }
     }
 
-    const setDriverLocally=async(id)=>{
-        const queryParameter = '?driverId='+id.toString()
+    const setDriverLocally = async (id) => {
+        const queryParameter = '?driverId=' + id.toString()
         try {
-            const data = await get('getDriver',queryParameter);
+            const data = await get('getDriver', queryParameter);
             if (data) {
                 await AsyncStorage.setItem('driverData', JSON.stringify(data));
                 setGlobalData('driverData', data);
@@ -118,38 +128,51 @@ const Login = ({ navigation }) => {
         }
     }
 
-    // Handle the button press
-    async function signInWithPhoneNumber(phoneNumber) {
+    // Creating OTP
+
+    const [otp, setOtp] = useState(845398)
+
+    function generateOTP(phoneNumber) {
+        // Generate a random 6-digit number
+        const randomOtp = Math.floor(100000 + Math.random() * 900000);
+        console.log(randomOtp);
+        setOtp((prev) => {
+            signInWithPhoneNumber(phoneNumber, randomOtp);
+            handleResendOTP();
+            return randomOtp;
+        }
+        );
+
+
+    }
+
+    async function signInWithPhoneNumber(phoneNumber, newOtp) {
         try {
             // Handling disabled state of the button
             setValid(false)
             setCode(null)
             setLoading(true);
-            const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-            setConfirm(confirmation);
-            if (confirmation) {
+            const response = await fetch('https://www.fast2sms.com/dev/bulkV2?authorization=rL4MxpFumIvbgGOf0UaP2XBR8Wqo7y6Vi1lThK5jknDc3HswzN9rxfpFHbe0wcoWGOXTvP6RtDmAIdQ5&route=otp&variables_values=' + newOtp + '&route=otp&numbers=' + phoneNumber); // Replace with your API endpoint
+            if (response) {
                 setLoading(false);
+                setConfirm(true);
             }
+
 
         } catch (error) {
             setLoading(false);
             console.log(error);
         }
     }
-
     async function confirmCode() {
         setLoading(true);
-        try {
-            let confirmation = await confirm.confirm(code);
-            // On successful verification
-            if (confirmation) {
-                auth().onAuthStateChanged(onAuthStateChanged);
-                checkAuthentication()
-            }
-        } catch (error) {
+        if (code == otp) {
+            checkAuthentication()
+        }
+        else {
+            console.log('Invalid Code');
             setLoading(false);
             onToggleSnackBar();
-            console.log(error, 'Invalid code.');
         }
     }
 
@@ -174,22 +197,28 @@ const Login = ({ navigation }) => {
     const editPhone = () => {
         // setPhone(null);
         setConfirm(false);
-        setValid(true)
+        setValid(true);
+        setIntervalId(null);
+        clearInterval(id)
+
     }
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <View style={style.mainContainer}>
-            {isChecking && <View style={style.loadingContainer}>
-                <ActivityIndicator animating={isChecking} color={'#0047ab'} />
-            </View>}
+                {loading && <AppLoader styles={{ top: '40%' }} />}
+                {isChecking && <View style={style.loadingContainer}>
+                    <ActivityIndicator animating={isChecking} color={'#0047ab'} />
+                </View>}
                 <View style={style.headerContainer} >
-                    <Text style={style.headerText}>
-                        Login here
-                    </Text>
-                    <Text style={style.subHeaderText} >
-                        Welcome back you've been missed!
-                    </Text>
+                    <Text style={style.headerText}> Load Go </Text>
+                    {!confirm && <View>
+                        <Text style={style.subHeaderText}> Log into your account </Text>
+                        <Text style={style.smallText}>Welcome to LoadGo, enter your details below to continue.</Text></View>}
+
+                    {confirm && <View>
+                        <Text style={style.subHeaderText}> SMS Code </Text>
+                        <Text style={style.smallText}>Enter 6 digit code which was sent to</Text></View>}
                     {confirm && <View style={style.editPhone}>
                         <Text style={[style.subHeaderText, { marginRight: 5 }]} >
                             {phone}
@@ -219,24 +248,24 @@ const Login = ({ navigation }) => {
                 </View>
                 <TouchableOpacity
                     disabled={!valid}
-                    onPress={() => !confirm ? signInWithPhoneNumber('+91' + phone) && handleResendOTP() : confirmCode()}
+                    onPress={() => !confirm ? generateOTP(phone) && handleResendOTP() : confirmCode()}
                     style={valid ? style.signInButton : style.signInButtonDisabled} >
                     <Text style={style.signInText} >
                         {!confirm ? 'Send OTP' : 'Verify OTP'}
                     </Text>
-                    {loading && <ActivityIndicator animating={true} color={'#fff'} />}
+
                 </TouchableOpacity>
                 {confirm &&
                     <>
-                        {count != 0 ?
+                        {timer != 0 ?
                             <View
                                 style={{ paddingTop: 30 }} >
-                                <Text style={style.semiboldText} >
-                                    Resend OTP in {count} sec
+                                <Text style={style.resendText} >
+                                    Resend OTP in {timer} sec
                                 </Text>
                             </View> :
                             <TouchableOpacity
-                                onPress={() => { signInWithPhoneNumber('+91' + phone); handleResendOTP() }}
+                                onPress={() => { generateOTP(phone) }}
                                 style={{ paddingTop: 30 }} >
                                 <Text style={style.activeText} >
                                     Resend OTP
@@ -247,7 +276,7 @@ const Login = ({ navigation }) => {
                 }
 
                 <Snackbar
-                    style={{ backgroundColor: '#c62828', width: '100%', marginHorizontal:20 }}
+                    style={{ backgroundColor: '#c62828', width: '100%', marginHorizontal: 20 }}
                     visible={visible}
                     duration={2000}
                     onDismiss={onDismissSnackBar}
@@ -261,36 +290,6 @@ const Login = ({ navigation }) => {
                 >
                     Invalid Code
                 </Snackbar>
-
-                {/* <View style={{ marginVertical: 30 }} >
-                        <Text style={[style.semiboldText, { color: Colors.primary }]} >
-                            Or continue with
-                        </Text>
-
-                        <View style={style.iconsContainer} >
-                            <TouchableOpacity style={style.iconStyle} >
-                                <Ionicons
-                                    name="logo-google"
-                                    color={Colors.text}
-                                    size={Spacing * 2}
-                                />
-                            </TouchableOpacity>
-                            <TouchableOpacity style={style.iconStyle} >
-                                <Ionicons
-                                    name="logo-apple"
-                                    color={Colors.text}
-                                    size={Spacing * 2}
-                                />
-                            </TouchableOpacity>
-                            <TouchableOpacity style={style.iconStyle} >
-                                <Ionicons
-                                    name="logo-facebook"
-                                    color={Colors.text}
-                                    size={Spacing * 2}
-                                />
-                            </TouchableOpacity>
-                        </View>
-                    </View> */}
             </View>
         </TouchableWithoutFeedback>
     )

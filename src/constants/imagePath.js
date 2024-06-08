@@ -12,5 +12,6 @@ export default{
     arrowRight:require('../assets/images/arrow-left.png'),
     arrowLeft:require('../assets/images/arrow-right.png'),
     docReview:require('../assets/images/docReview.jpg'),
-    locationAccess:require('../assets/images/locationAccess.png')
+    locationAccess:require('../assets/images/locationAccess.png'),
+    noDataFound:require('../assets/images/empty-box.png'),
 }

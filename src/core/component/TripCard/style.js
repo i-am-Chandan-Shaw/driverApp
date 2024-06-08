@@ -7,36 +7,36 @@ const style = StyleSheet.create({
       lineHeight: 20,
       fontWeight: 700,
    },
-      headerContainer:{
-         flexDirection:'row',
-         alignItems:'center',
-         marginBottom:10,
-         paddingHorizontal: 15,
-         marginTop:15
+   headerContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 10,
+      paddingHorizontal: 15,
+      marginTop: 15
    },
-   headerText:{
-      fontSize:16,
-      color:'#000'
+   headerText: {
+      fontSize: 16,
+      color: '#000'
    },
    cards: {
       alignSelf: 'center',
       width: width - 20,
       backgroundColor: '#fff',
       borderRadius: 5,
-      marginBottom:20,
+      marginBottom: 20,
    },
-   indicatorContainer:{
-      width:70,
-      height:70,
-      borderRadius:10,
-      justifyContent:'center',
-      alignItems:'center',
-      backgroundColor:'rgba(0,0,0,0.5)',
-      position:'absolute',
-      zIndex:100,
-      alignSelf:'center',
-      top:'50%'
-  },
+   indicatorContainer: {
+      width: 70,
+      height: 70,
+      borderRadius: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      position: 'absolute',
+      zIndex: 100,
+      alignSelf: 'center',
+      top: '50%'
+   },
    topContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -86,9 +86,9 @@ const style = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginTop:15,
+      marginTop: 15,
       paddingHorizontal: 15,
-      marginBottom:15
+      marginBottom: 15
    },
    button: {
       flex: 1,
@@ -98,12 +98,12 @@ const style = StyleSheet.create({
       justifyContent: 'center',
       alignItems: 'center',
    },
-   btnText:{
+   btnText: {
       fontSize: 15,
       color: '#000',
-      fontWeight:500
-   }
-
+      fontWeight: 500
+   },
+   
 });
 
 export default style;

@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const TripCard = ({ cardData, sendData, userData }) => {
     const [renderedData, setRenderedData] = useState([cardData[0]]);
     const { globalData, setGlobalData } = useContext(AppContext);
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
 
     const navigation = useNavigation();
     useEffect(() => {
@@ -46,7 +46,8 @@ const TripCard = ({ cardData, sendData, userData }) => {
         setIsLoading(true)
         try {
             trip = await getUpdatedTripDetails(trip.tripId);
-            if (trip) {
+            console.log(trip);
+            if (trip.status == 1) {
                 const payload = {
                     id: trip.tripId,
                     status: 2,
@@ -55,17 +56,26 @@ const TripCard = ({ cardData, sendData, userData }) => {
                 try {
                     const data = await patch(payload, 'patchRequestVehicle');
                     if (data) {
-                        const updatedData = []
-                        sendData(updatedData, 'accepted');
                         trackLive(trip);
-                        setIsLoading(false)
+
                     }
                 } catch (error) {
                     console.log(error);
                     setIsLoading(false)
 
                 }
+            } else if (trip.status == 2) {
+                const updatedData = []
+                setIsLoading(false);
+                sendData(updatedData, 'invalid');
+            } else {
+                const updatedData = []
+                setIsLoading(false);
+                sendData(updatedData, 'others');
             }
+
+
+
         } catch (error) {
             console.log('acceptRide error===>', error);
             setIsLoading(false)
@@ -186,7 +196,10 @@ const TripCard = ({ cardData, sendData, userData }) => {
                 renderItem={renderItem}
                 keyExtractor={(item) => item.tripId}
             />}
+
         </View>
+
+
 
     )
 }

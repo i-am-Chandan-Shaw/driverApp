@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, Text, Image, Pressable, FlatList, Alert } from 'react-native';
 import { Button } from 'react-native-paper';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
@@ -9,24 +9,71 @@ import style from './style';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import imagePath from '../../constants/imagePath';
+import { get, patch } from '../../core/helper/services';
+import { AppContext } from '../../core/helper/AppContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import AppLoader from '../../core/component/AppLoader';
 
 
 
 const Verification = () => {
     const Slide = ({ item, index }) => {
-        let currentFront='', currentBack=''
-        if(index==0){
-            currentFront='aadharFront',
-            currentBack='aadharBack'
+        let currentFront = '', currentBack = ''
+        if (index == 0) {
+            currentFront = 'aadharFront',
+                currentBack = 'aadharBack'
         }
-        if(index==1){
-            currentFront='dlFront',
-            currentBack='dlBack'
+        if (index == 1) {
+            currentFront = 'dlFront',
+                currentBack = 'dlBack'
         }
-        if(index==2){
-            currentFront='rcFront',
-            currentBack='rcBack'
+        if (index == 2) {
+            currentFront = 'rcFront',
+                currentBack = 'rcBack'
         }
+
+        const clearFrontPic = () => {
+
+            if (index == 0) {
+                setPic({
+                    ...pic,
+                    aadharFront: ''
+                })
+            } else if (index == 1) {
+                setPic({
+                    ...pic,
+                    dlFront: ''
+                })
+            } else if (index == 2) {
+                setPic({
+                    ...pic,
+                    rcFront: ''
+                })
+            }
+
+        }
+
+        const clearBackPic = () => {
+
+            if (index == 0) {
+                setPic({
+                    ...pic,
+                    aadharBack: ''
+                })
+            } else if (index == 1) {
+                setPic({
+                    ...pic,
+                    dlBack: ''
+                })
+            } else if (index == 2) {
+                setPic({
+                    ...pic,
+                    rcBack: ''
+                })
+            }
+
+        }
+
         return (
             <View style={{ marginRight: index == 2 ? 20 : 0 }}>
                 <Text style={style.largeText}>{item.documentName} Details</Text>
@@ -48,7 +95,7 @@ const Verification = () => {
                             />
 
                         </Pressable>
-                        <Pressable style={style.closeIcon} onPress={() => { setPic({ ...pic, aadharFront: '' }) }}>
+                        <Pressable style={style.closeIcon} onPress={clearFrontPic}>
                             <AntIcon name="closecircle" size={25} color='#fff' />
                         </Pressable>
                     </View>}
@@ -69,12 +116,12 @@ const Verification = () => {
                             <Image style={style.img} source={{ uri: 'data:image/jpeg;base64,' + pic[currentBack] }}
                             />
                         </Pressable>
-                        <Pressable style={style.closeIcon} onPress={() => { setPic({ ...pic, aadharBack: '' }) }}>
+                        <Pressable style={style.closeIcon} onPress={clearBackPic}>
                             <AntIcon name="closecircle" size={25} color='#fff' />
                         </Pressable>
                     </View>}
                 </View>
-            </View>
+            </View >
         )
     }
     const slideList = [
@@ -104,7 +151,9 @@ const Verification = () => {
 
     const [currIndex, setCurrIndex] = useState(0);
     const [currentSide, selectSide] = useState();
-    const [isSubmitted, setIsSubmitted]= useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const { globalData, setGlobalData } = useContext(AppContext);
+    const [isLoading, setIsLoading] = useState(false);
 
 
 
@@ -153,7 +202,7 @@ const Verification = () => {
 
             })
         } else {
-            launchImageLibrary(options, response =>  {
+            launchImageLibrary(options, response => {
                 if (!response.didCancel) {
                     if (currentSide == 'front') {
                         let docType = ''
@@ -164,7 +213,6 @@ const Verification = () => {
                         } else {
                             docType = 'rcFront'
                         }
-                        console.log(response.assets[0].base64);
                         setPic({
                             ...pic,
                             [docType]: response.assets[0].base64
@@ -192,34 +240,100 @@ const Verification = () => {
         bottomSheetRef.current?.close();
     }
 
-    const showImgErrorAlert=()=>{
+    const showImgErrorAlert = () => {
         Alert.alert(
             'Alert',
             'Please upload both side of the image !',
             [
-              { text: 'OK'},
+                { text: 'OK' },
             ],
-            { 
-              // Specify the custom style for the alert container
-              containerStyle: style.alertContainer,
-              // Specify the custom style for the alert text
-              textStyle: style.alertText,
+            {
+                // Specify the custom style for the alert container
+                containerStyle: style.alertContainer,
+                // Specify the custom style for the alert text
+                textStyle: style.alertText,
             }
-          );
+        );
     }
 
-    const submitDocuments=()=>{
-        setIsSubmitted(true)
+    const submitDocuments = () => {
+
+        updatedVerificationProcess();
+
+    }
+
+    useEffect(() => {
+        console.log(globalData.driverId);
+
+        if (globalData.driverData[0].isVerified == '2') {
+            setIsSubmitted(true);
+        }
+    }, [])
+
+
+    const updatedVerificationProcess = async () => {
+        setIsLoading(true)
+        let documentData = {
+            id: globalData?.driverId,
+            isVerified: '2',
+            aadharBack: pic.aadharBack,
+            aadharFront: pic.aadharFront,
+            dlBack: pic.dlBack,
+            dlFront: pic.dlFront,
+            rcBack: pic.rcBack,
+            rcFront: pic.rcFront
+        }
+
+        try {
+            const data = await patch(documentData, 'patchDriver');
+            if (data) {
+                setDriverLocally(globalData?.driverId);
+                setIsSubmitted(true);
+                setIsLoading(false)
+            }
+        } catch (error) {
+            console.log('updatedVerificationProcess', error);
+            setIsLoading(false)
+        }
+
+
+    }
+
+    const setDriverLocally = async (id) => {
+        setIsLoading(true)
+        const queryParameter = '?driverId=' + id.toString()
+        try {
+            const data = await get('getDriver', queryParameter);
+            if (data) {
+                setGlobalData('driverData', data);
+                console.log(data);
+                setDataToLocalStorage('driverData', data);
+                setIsLoading(false);
+            }
+        } catch (error) {
+            console.log('setDriverLocally===>', error);
+            setIsLoading(false);
+        }
+    }
+
+    const setDataToLocalStorage = async (key, data) => {
+        try {
+            await AsyncStorage.setItem(key, JSON.stringify(data));;
+            console.log('Data saved successfully!');
+        } catch (error) {
+            console.log('Error retrieving data:', error);
+            return false
+        }
     }
 
     const goNext = () => {
-        if(currIndex==0 && ( pic.aadharFront=='' || pic.aadharBack=='')){
+        if (currIndex == 0 && (pic.aadharFront == '' || pic.aadharBack == '')) {
             showImgErrorAlert();
             return;
-        }else if (currIndex==1 && (pic.dlFront=='' || pic.dlBack=='')){
+        } else if (currIndex == 1 && (pic.dlFront == '' || pic.dlBack == '')) {
             showImgErrorAlert();
             return;
-        }else if (currIndex==2 && (pic.rcFront=='' || pic.rcBack=='')){
+        } else if (currIndex == 2 && (pic.rcFront == '' || pic.rcBack == '')) {
             showImgErrorAlert();
             return;
         }
@@ -243,19 +357,20 @@ const Verification = () => {
     const [pic, setPic] = useState({
         aadharFront: '',
         aadharBack: '',
-        dlFront:'',
-        dlBack:'',
-        rcFront:'',
-        rcBack:''
+        dlFront: '',
+        dlBack: '',
+        rcFront: '',
+        rcBack: ''
     })
 
-    useEffect(()=>{
-        console.log(pic)
-    },[pic])
+    useEffect(() => {
+        // console.log(pic)
+    }, [pic])
 
 
     return (
         <GestureHandlerRootView>
+            {isLoading && <AppLoader styles={{ top: '40%' }} />}
             <BottomSheetModalProvider>
                 {!isSubmitted && <View style={style.docContainer}>
                     <FlatList
@@ -282,12 +397,12 @@ const Verification = () => {
 
                 </View>}
                 {isSubmitted && <View style={style.submitContainer}>
-                    <Image style={{height:200, width:300}} source={imagePath.docReview} />
-                    <Text style={[style.headerText, {textAlign:'center'}]}>
+                    <Image style={{ height: 200, width: 300 }} source={imagePath.docReview} />
+                    <Text style={[style.headerText, { textAlign: 'center' }]}>
                         Your document is under review
                     </Text>
-                    <Text style={[style.subHeaderText, {textAlign:'center'}]}>
-                    Your profile has been submitted & will be reviewed by our team. You will be notified if any extra information is needed.
+                    <Text style={[style.subHeaderText, { textAlign: 'center' }]}>
+                        Your profile has been submitted & will be reviewed by our team. You will be notified if any extra information is needed.
                     </Text>
                 </View>}
                 <BottomSheetModal

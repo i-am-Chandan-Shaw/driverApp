@@ -6,16 +6,16 @@ const style = StyleSheet.create({
   container: {
   },
   balanceContainer: {
-    alignSelf:'center',
-    flexDirection:'column',
-    alignItems:'center',
-    width:width*0.92,
-    padding:20,
+    alignSelf: 'center',
+    flexDirection: 'column',
+    alignItems: 'center',
+    width: width * 0.92,
+    padding: 20,
     backgroundColor: '#fff',
     borderTopRightRadius: 8,
-    borderTopLeftRadius:8,
+    borderTopLeftRadius: 8,
     marginVertical: 10,
-    elevation:5,
+    elevation: 5,
   },
   subHeaderText: {
     fontFamily: "Poppins-SemiBold",
@@ -26,65 +26,72 @@ const style = StyleSheet.create({
   headerText: {
     fontSize: FontSize.xLarge,
     color: "#000",
-    fontWeight:700
+    fontWeight: 700
   },
   mediumText: {
     fontFamily: "Poppins-SemiBold",
     fontSize: FontSize.medium,
     color: "#000",
   },
-  smallText:{
+  smallText: {
     fontSize: FontSize.small,
     color: "#000",
-    fontWeight:500
+    fontWeight: 500
   },
-  xSmallText:{
+  xSmallText: {
     fontSize: 11,
     color: "#000",
   },
-  subheaderContainer:{
-    flexDirection:'row',
-    justifyContent:'space-around',
-    alignSelf:'center',
-    marginTop:15,
-    width:width*0.92,
+  subheaderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignSelf: 'center',
+    marginTop: 15,
+    width: width * 0.92,
   },
-  imageContainer:{
-    width:50,
-    height:50,
-    borderRadius:25,
-    backgroundColor:'#111',
-    flexDirection:'row',
-    alignItems:'center',
-    justifyContent:'center'
+  imageContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#111',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
-  columnCenter:{
-    flexDirection:'column',
-    alignItems:'center',
-    justifyContent:'center'
+  columnCenter: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
-  rowCenter:{
-    flexDirection:'row',
-    alignItems:'center',
+  rowCenter: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  transactionContainer:{
-    flexDirection:'row',
-    alignItems:'center',
-    justifyContent:'space-between',
+  transactionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: '#fff',
-    borderRadius:6,
-    padding:15,
-    paddingRight:5,
-    marginTop:10
+    borderRadius: 6,
+    padding: 15,
+    paddingRight: 5,
+    marginTop: 10
   },
-  bottomContainer:{
-    width:width*0.92,
-    alignSelf:'center',
-    marginTop:30,
+  bottomContainer: {
+    width: width * 0.92,
+    alignSelf: 'center',
+    marginTop: 30,
   },
-  scrollContainer:{
+  scrollContainer: {
     height: height - 360,
-    marginBottom:10,
+    marginBottom: 10,
+  },
+  emptyContainer: {
+    height: height - 400,
+    width: width * 0.92,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent:'center'
   }
 });
 

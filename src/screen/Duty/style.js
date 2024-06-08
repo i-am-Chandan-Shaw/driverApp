@@ -82,6 +82,12 @@ const style = StyleSheet.create({
       paddingVertical: 5,
       paddingHorizontal: 10,
       borderRadius: 5
+   },
+   snackBar: {
+      marginHorizontal: 20,
+      zIndex:10000,
+      position:'absolute',
+      bottom:10
    }
 
 

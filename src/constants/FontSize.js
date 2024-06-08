@@ -1,4 +1,4 @@
-const small = 14;
+const small = 12;
 const medium = 16;
 const large = 20;
 const xLarge = 30;

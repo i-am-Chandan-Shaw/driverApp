@@ -5,7 +5,7 @@ import Colors from "../../constants/Colors";
 const Spacing = 10;
 const style = StyleSheet.create({
     mainContainer: {
-        height:'100%',
+        height: '100%',
         padding: 20
     },
     headerContainer: {
@@ -20,9 +20,17 @@ const style = StyleSheet.create({
     subHeaderText: {
         fontFamily: 'Poppins-SemiBold',
         fontSize: FontSize.large,
-        maxWidth: "80%",
+        maxWidth: "100%",
         textAlign: "center",
-        color: '#333'
+        color: '#000',
+    },
+    smallText: {
+        fontFamily: 'Poppins-SemiBold',
+        fontSize: FontSize.small,
+        textAlign: 'center',
+        maxWidth: '80%',
+        marginTop: 10,
+        color: '#444'
     },
     forgotPasswordText: {
         fontFamily: 'Poppins-SemiBold',
@@ -31,7 +39,7 @@ const style = StyleSheet.create({
         alignSelf: "flex-end",
     },
     signInButton: {
-        padding: Spacing * 2,
+        padding: Spacing * 1.4,
         backgroundColor: Colors.primary,
         borderRadius: Spacing,
         shadowColor: Colors.primary,
@@ -41,12 +49,12 @@ const style = StyleSheet.create({
         },
         shadowOpacity: 0.3,
         shadowRadius: Spacing,
-        flexDirection:'row',
-        justifyContent:'center'
+        flexDirection: 'row',
+        justifyContent: 'center'
     },
-    signInButtonDisabled:{
-        opacity:0.5,
-        padding: Spacing * 2,
+    signInButtonDisabled: {
+        opacity: 0.5,
+        padding: Spacing * 1.4,
         backgroundColor: Colors.primary,
         borderRadius: Spacing,
         shadowColor: Colors.primary,
@@ -56,14 +64,15 @@ const style = StyleSheet.create({
         },
         shadowOpacity: 0.3,
         shadowRadius: Spacing,
-        flexDirection:'row',
-        justifyContent:'center'
+        flexDirection: 'row',
+        justifyContent: 'center'
     },
     signInText: {
         color: Colors.onPrimary,
         textAlign: "center",
-        fontSize: FontSize.large,
-        marginRight:10
+        fontFamily: 'Poppins-SemiBold',
+        fontSize: FontSize.medium,
+        marginRight: 10
     },
     semiboldText: {
         fontFamily: 'Poppins-SemiBold',
@@ -71,11 +80,21 @@ const style = StyleSheet.create({
         textAlign: "center",
         fontSize: FontSize.small,
     },
+    resendText: {
+        fontFamily: 'Poppins',
+        color: '#444',
+        textAlign: "center",
+        fontSize: FontSize.medium,
+
+    },
+    disabledText: {
+        opacity: 0.3
+    },
     activeText: {
         fontFamily: 'Poppins-SemiBold',
         color: 'green',
         textAlign: "center",
-        fontSize: FontSize.small,
+        fontSize: FontSize.medium,
     },
     iconsContainer: {
         marginTop: Spacing,
@@ -88,22 +107,23 @@ const style = StyleSheet.create({
         borderRadius: Spacing / 2,
         marginHorizontal: Spacing,
     },
-    editPhone:{
-        height:30,
-        flexDirection:'row',
-        alignItems:'center'
+    editPhone: {
+        height: 30,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10
     },
-    loadingContainer:{
-        position:'absolute',
-        top:'50%',
-        left:'50%',
-        backgroundColor:'#fff',
-        alignSelf:'flex-start',
-        padding:20,
-        elevation:5,
-        opacity:1,
-        zIndex:100,
-        borderRadius:8
+    loadingContainer: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        backgroundColor: '#fff',
+        alignSelf: 'flex-start',
+        padding: 20,
+        elevation: 5,
+        opacity: 1,
+        zIndex: 100,
+        borderRadius: 8
     }
 });
 

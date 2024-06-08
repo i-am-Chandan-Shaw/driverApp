@@ -4,14 +4,33 @@ import { Avatar } from 'react-native-paper';
 import style from './style';
 import AccountList from '../../core/component/AccountList';
 import { AppContext } from '../../core/helper/AppContext';
-import { setDataLocally } from '../../core/helper/helper';
+import { get } from '../../core/helper/services';
 
 const Account = (props) => {
     const { globalData, setGlobalData } = useContext(AppContext)
     const [driverData, setDriverData] = useState(null)
     useEffect(() => {
-        setDriverData(globalData.driverData[0])
+        if (globalData.driverData) {
+            setDriverData(globalData.driverData[0])
+        } else {
+            setDriverLocally(globalData.driverId);
+            console.log(globalData);
+        }
+
     }, [globalData])
+
+
+    const setDriverLocally = async (id) => {
+        const queryParameter = '?driverId=' + id.toString()
+        try {
+            const data = await get('getDriver', queryParameter);
+            if (data) {
+                setGlobalData('driverData', JSON.parse(data));
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
 
 

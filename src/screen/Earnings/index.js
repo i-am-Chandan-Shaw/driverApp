@@ -22,8 +22,8 @@ const Earnings = () => {
             </View>
             <View style={style.offerBanner}>
                 <Text style={[style.poppinsMedium, { color: '#fff' }]}>Today's Earnings</Text>
-                <Text style={[style.headerText, { color: '#fff' }]}>₹ 230</Text>
-                <Text style={[style.poppinsMedium, { color: '#fff' }]}>2 Rides Completed</Text>
+                <Text style={[style.headerText, { color: '#fff' }]}>₹ 0</Text>
+                <Text style={[style.poppinsMedium, { color: '#fff' }]}>0 Rides Completed</Text>
             </View>
             <Pressable android_ripple={{ color: '#eee', borderless: false }}
                 onPress={() => { navigateTo('RideHistory') }} style={[style.boxContainer]} >

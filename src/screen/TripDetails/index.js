@@ -25,7 +25,7 @@ const TripDetails = (props) => {
                     <View style={style.topContainer}>
                         <View >
                             <View >
-                                <Text style={style.subHeaderText}>{data.date}, {data.time}</Text>
+                                <Text style={style.subHeaderText}>{data.requestDate}, {data.requestTime}</Text>
                             </View>
                             <View>
                                 <Text style={style.secondarySemibold}>CRN {data.tripId}</Text>
@@ -38,8 +38,8 @@ const TripDetails = (props) => {
                     <AppDivider bgColor={'#d6d6d6'} />
                     <View style={style.middleContainer}>
                         <View style={style.leftContent}>
-                            <Image style={[style.image, { marginRight: 20 }]} source={imagePath[data.vehicleType]} />
-                            <Text style={style.subHeaderText}>{data.vehicleName}</Text>
+                            <Image style={[style.image, { marginRight: 20 }]} source={imagePath.tataAce} />
+                            <Text style={style.subHeaderText}>Tata Ace</Text>
                         </View>
                         <View style={style.rightContent}>
                             <MaterialIcons name="cash" color={'green'} size={40} />
@@ -49,9 +49,9 @@ const TripDetails = (props) => {
                     <AppDivider bgColor={'#d6d6d6'} />
                     <View style={style.locationContainer}>
                         <View style={style.locationText}>
-                            <Text numberOfLines={1} style={[style.text]}>12:54 PM</Text>
+                            <Text numberOfLines={1} style={[style.text]}>{data.requestTime}</Text>
                             <View style={{ height: 17 }}></View>
-                            <Text numberOfLines={1} style={[style.text]}>{data.time}</Text>
+                            <Text numberOfLines={1} style={[style.text]}>{data.requestTime}</Text>
                         </View>
                         <View style={style.timeLine}>
                             <View style={style.circle}></View>
@@ -59,9 +59,9 @@ const TripDetails = (props) => {
                             <View style={[style.circle, { backgroundColor: '#568203' }]}></View>
                         </View>
                         <View style={style.locationText}>
-                            <Text numberOfLines={1} style={[style.text]}>{data.pickup}</Text>
+                            <Text numberOfLines={1} style={[style.text]}>{data.pickUpLocation}</Text>
                             <View style={{ height: 17 }}></View>
-                            <Text numberOfLines={1} style={[style.text]}>{data.drop}</Text>
+                            <Text numberOfLines={1} style={[style.text]}>{data.dropLocation}</Text>
                         </View>
                     </View>
                     <AppDivider bgColor={'#d6d6d6'} />
@@ -86,7 +86,7 @@ const TripDetails = (props) => {
 
                         <View style={[style.billRow, {borderBottomWidth:0}]}>
                             <Text style={style.subHeaderText}>Payment Method</Text>
-                            <Text style={[style.subHeaderText]}>Cash</Text>
+                            <Text style={[style.subHeaderText]}>{data.paymentMethod}</Text>
                         </View>
                     </View>
                 </View>

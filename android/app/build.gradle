@@ -102,8 +102,8 @@ android {
         applicationId "com.loadgopartner"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 7
+        versionName "1.000007"
     }
 
     splits {
@@ -114,6 +114,9 @@ android {
             include (*reactNativeArchitectures())
         }
     }
+    lintOptions { 
+        checkReleaseBuilds false 
+    }
     signingConfigs {
          release {
             if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
@@ -123,12 +126,7 @@ android {
                 keyPassword MYAPP_UPLOAD_KEY_PASSWORD
             }
         }
-        debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-        }
+       
     }
     buildTypes {
         debug {
@@ -141,7 +139,7 @@ android {
             signingConfig signingConfigs.release
             manifestPlaceholders = [API_KEY: "$System.env.REACT_APP_MAPS_API"]
 
-            debuggable true
+            debuggable false
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }

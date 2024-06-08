@@ -7,7 +7,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 const Incentive=()=>{
     const incentiveData={
         id:0,
-        ridesCompleted:4,
+        ridesCompleted:0,
         incentivesList:[
             {
                 id:0,
