@@ -11,6 +11,7 @@ export const post = (payload, type) => new Promise((resolve, reject) => {
     };
     fetch(apiString + type + '.php', requestOptions)
         .then(response => {
+            console.log(response);
             if (response.ok) {
                 // If the response is OK
                 response.json()
