@@ -6,13 +6,13 @@ const style = StyleSheet.create({
   mediumText: {
     fontSize: FontSize.medium,
     color: "#000",
-    fontWeight:600
+    fontWeight: 600
   },
   subHeaderText: {
     fontFamily: "Poppins-SemiBold",
     fontSize: FontSize.large,
     color: "#000",
-    
+
   },
   headerText: {
     fontFamily: "Poppins-SemiBold",
@@ -31,11 +31,11 @@ const style = StyleSheet.create({
     paddingLeft: 20,
     shadowColor: '#000',
     shadowOffset: { width: 1, height: 1 },
-    shadowOpacity:  0.4,
+    shadowOpacity: 0.4,
     shadowRadius: 3,
     elevation: 5,
-    backgroundColor:'#fff',
-    marginBottom:10,
+    backgroundColor: '#fff',
+    marginBottom: 10,
   },
   offerBanner: {
     width: width * 0.92,
@@ -46,23 +46,23 @@ const style = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom:20
+    marginBottom: 20
   },
-  boxContainer:{
-    width:width*0.92,
-    alignSelf:'center',
-    padding:20,
+  boxContainer: {
+    width: width * 0.92,
+    alignSelf: 'center',
+    padding: 20,
     backgroundColor: '#fff',
     borderRadius: 8,
     marginVertical: 10,
-    elevation:5,
+    elevation: 5,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent:'space-between',
+    justifyContent: 'space-between',
   },
-  optionContainer:{
-    flexDirection:'row',
-    alignItems:'center'
+  optionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center'
   }
 });
 

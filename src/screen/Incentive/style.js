@@ -7,7 +7,7 @@ const style = StyleSheet.create({
     fontFamily: "Poppins-SemiBold",
     fontSize: FontSize.large,
     color: "#000",
-    
+
   },
   headerText: {
     fontFamily: "Poppins-SemiBold",
@@ -26,11 +26,11 @@ const style = StyleSheet.create({
     paddingLeft: 20,
     shadowColor: '#000',
     shadowOffset: { width: 1, height: 1 },
-    shadowOpacity:  0.4,
+    shadowOpacity: 0.4,
     shadowRadius: 3,
     elevation: 5,
-    backgroundColor:'#fff',
-    marginBottom:10
+    backgroundColor: '#fff',
+    marginBottom: 10
   },
   offerBanner: {
     width: width * 0.92,
@@ -41,7 +41,7 @@ const style = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom:20
+    marginBottom: 20
   },
   whiteBanner: {
     alignSelf: "center",
@@ -49,16 +49,16 @@ const style = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: "#fff",
     borderRadius: 5,
-    marginTop:10
+    marginTop: 10
   },
-  incentiveContainer:{
-    width:width*0.92,
-    alignSelf:'center',
-    padding:20,
+  incentiveContainer: {
+    width: width * 0.92,
+    alignSelf: 'center',
+    padding: 20,
     backgroundColor: 'white',
     borderRadius: 8,
     marginVertical: 10,
-    elevation:5
+    elevation: 5
   }
 });
 

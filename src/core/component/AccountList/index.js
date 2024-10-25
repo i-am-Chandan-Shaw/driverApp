@@ -4,7 +4,6 @@ import style from './style';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import MatIcon from 'react-native-vector-icons/MaterialIcons';
 import FAIcon from 'react-native-vector-icons/FontAwesome';
-import { Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -15,7 +14,7 @@ const AccountList = ({ driverData }) => {
 
   useEffect(() => {
     setData(driverData)
-    console.log({driverData});
+    console.log({ driverData });
   }, [driverData])
 
   const navigation = useNavigation()
@@ -156,9 +155,9 @@ const AccountList = ({ driverData }) => {
         <View style={style.list}>
           <View style={style.leftSection}>
             <View style={[style.listIcon, { backgroundColor: item.backgroundColor }]} >
-              {(item.title != 'Verification' && item.title != 'Bank Details') && <FeatherIcon name={item.icon} color="#fff" size={21} />}
-              {item.title == 'Verification' && <MatIcon name={item.icon} color="#fff" size={21} />}
-              {item.title == 'Bank Details' && <FAIcon name={item.icon} color="#fff" size={16} />}
+              {(item.title != 'Verification' && item.title != 'Bank Details') && <FeatherIcon name={item.icon} color="#fff" size={18} />}
+              {item.title == 'Verification' && <MatIcon name={item.icon} color="#fff" size={18} />}
+              {item.title == 'Bank Details' && <FAIcon name={item.icon} color="#fff" size={13} />}
             </View>
             <View>
               <Text style={style.listTitle}>{item.title}</Text>
@@ -166,12 +165,14 @@ const AccountList = ({ driverData }) => {
             </View>
           </View>
           <View style={style.rightSection}>
-            {item.buttonText && (<Button style={{ borderColor: '#d6d6d6' }} textColor='#0047ab' mode={item.buttonType} >{item.buttonText} </Button>)}
-            {item.nextPage && <FeatherIcon name='chevron-right' size={22} />}
+            {item.buttonText && (<View style={style.button}  activeOpacity={0.7}>
+              <Text style={style.buttonText}>{item.buttonText}</Text>
+            </View>)}
+            {item.nextPage && <FeatherIcon name='chevron-right' size={18} />}
           </View>
         </View>
-      </Pressable>
-    </View>
+      </Pressable >
+    </View >
   ))
 
 

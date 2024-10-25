@@ -16,6 +16,7 @@ import AppLoader from '../../core/component/AppLoader';
 import { AppContext } from '../../core/helper/AppContext';
 import messaging from '@react-native-firebase/messaging';
 import { Snackbar } from 'react-native-paper';
+import WebViewBanner from '../../core/component/Promotion-Banner/WebViewBanner';
 
 
 const { width, height } = Dimensions.get('window');
@@ -45,7 +46,7 @@ const Duty = () => {
     const onDismissSnackBar = () => setVisible(false);
 
 
-
+    const [isModalVisible, setIsModalVisible] = useState(true);
 
     const mapRef = useRef();
     let timeout;
@@ -100,9 +101,9 @@ const Duty = () => {
 
             const data = await get('getRequestVehicle', queryParameter);
             if (data) {
-                console.log(data,'==>',globalData.driverData[0].id);
+                console.log(data, '==>', globalData.driverData[0].id);
                 setActiveRideData(data[0])
-                if ((data[0].status == 2 || data[0].status == 4)&& globalData.driverData[0].id == data[0].driverId) {
+                if ((data[0].status == 2 || data[0].status == 4) && globalData.driverData[0].id == data[0].driverId) {
                     setIsRideActive(true);
                 } else {
                     clearInterval(waitForTripStatus);
@@ -306,6 +307,11 @@ const Duty = () => {
         });
     }
 
+    const toggleModal = () => {
+        setIsModalVisible(!isModalVisible);
+      };
+    
+
 
     return (
         <View>
@@ -322,7 +328,7 @@ const Duty = () => {
                 {isLoading && <AppLoader styles={{ top: 300 }} />}
                 {!isDutyOn && <View style={style.waitingContainer}>
                     <Image style={style.image} source={imagePath.van} />
-                    <Text style={style.mediumText}>Go ON DUTY to start earning !  </Text>
+                    <Text style={[style.mediumText,{marginTop:30}]}>Go ON DUTY to start earning !  </Text>
                 </View>}
                 {/* On Duty */}
 
@@ -331,6 +337,12 @@ const Duty = () => {
                 {(isDutyOn && availableTrips.length > 0) && <View style={style.cardsContainer}>
                     <TripCard sendData={updatedData} cardData={availableTrips}></TripCard>
                 </View>}
+
+                <WebViewBanner
+                    visible={isModalVisible}
+                    onClose={toggleModal}
+                    contentUrl="https://reactnative.dev/docs/running-on-device"
+                />
 
                 {/* Map */}
                 {isDutyOn && (<MapView ref={mapRef} style={style.mapContainer}
@@ -364,7 +376,7 @@ const Duty = () => {
 
 
                 </MapView>)}
-
+               
 
 
                 {/* Center Button */}

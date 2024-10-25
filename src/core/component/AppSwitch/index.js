@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { View, TouchableWithoutFeedback, Text } from 'react-native';
-import style from './style';
+import useStyles from './style';
+import { useTheme } from '../../../constants/ThemeContext';
 
-const AppSwitch = ({toggleSwitch}) => {
+const AppSwitch = ({ toggleSwitch }) => {
+    const styles = useStyles();
 
+    const {theme} = useTheme()
     const [isSwitchOn, setIsSwitchOn] = useState(false);
 
     const onToggleSwitch = () => {
@@ -14,10 +17,10 @@ const AppSwitch = ({toggleSwitch}) => {
     return (
         <View>
             <TouchableWithoutFeedback onPress={onToggleSwitch}>
-                <View style={style.container}>
-                    <View style={[style.switchTrack, { backgroundColor: isSwitchOn ? '#4773fa' : '#ccc' }]}>
-                         <Text style={isSwitchOn? style.textLeft: style.textRight}>{isSwitchOn ? 'Online' : 'Offline'}</Text>
-                        <View style={[style.thumb, { left: isSwitchOn ? 93 : 3 }]} />
+                <View style={styles.container}>
+                    <View style={[styles.switchTrack, { backgroundColor: isSwitchOn ? theme.bgPrimary : '#ccc' }]}>
+                        <Text style={isSwitchOn ? styles.textLeft : styles.textRight}>{isSwitchOn ? 'Online' : 'Offline'}</Text>
+                        <View style={[styles.thumb, { left: isSwitchOn ? 81 : 3 }]} />
                     </View>
                 </View>
             </TouchableWithoutFeedback>

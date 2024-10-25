@@ -73,8 +73,6 @@ const style = StyleSheet.create({
         borderWidth: 1,
         borderColor:'#d6d6d6',
         height:50,
-        marginVertical:10,
-        marginBottom:20
     },
     noteText: {
         fontFamily: 'Poppins-SemiBold',

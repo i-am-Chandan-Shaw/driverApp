@@ -38,7 +38,7 @@ const Account = (props) => {
     return (
         <View>
             <View style={style.headerContainer}>
-                <Avatar.Icon size={50} icon="account" color='#fff' style={{ backgroundColor: '#858f9e' }} />
+                <Avatar.Icon size={40} icon="account" color='#fff' style={{ backgroundColor: '#858f9e' }} />
                 <View style={style.headerTextContainer}>
                     <Text numberOfLines={1} style={style.nameText}>{driverData?.driverName}</Text>
                     <View style={style.subHeaderTextContainer}>

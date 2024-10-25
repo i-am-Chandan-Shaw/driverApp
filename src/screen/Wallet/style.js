@@ -91,7 +91,7 @@ const style = StyleSheet.create({
     width: width * 0.92,
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent:'center'
+    justifyContent: 'center'
   }
 });
 

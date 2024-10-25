@@ -8,7 +8,7 @@ export default{
     cash:require('../assets/images/cash.png'),
     discount:require('../assets/images/discount.png'),
     truck:require('../assets/images/minitruck.png'),
-    van:require('../assets/images/van.png'),
+    van:require('../assets/images/duty.png'),
     arrowRight:require('../assets/images/arrow-left.png'),
     arrowLeft:require('../assets/images/arrow-right.png'),
     docReview:require('../assets/images/docReview.jpg'),

@@ -1,16 +1,20 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, Keyboard, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Keyboard, ScrollView, TouchableOpacity, Alert, TouchableWithoutFeedback } from 'react-native';
 import style from './style';;
 import AppTextInput from '../../core/component/AppTextInput';
 import { Picker } from '@react-native-picker/picker';
-import { Snackbar, Provider, ActivityIndicator } from 'react-native-paper';
+import { Snackbar, Checkbox, Appbar } from 'react-native-paper';
 import { post, get } from '../../core/helper/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppContext } from '../../core/helper/AppContext';
 import AppLoader from '../../core/component/AppLoader';
+import Colors from '../../constants/Colors';
+import FontSize from '../../constants/FontSize';
+import commonStyles from '../../constants/commonStyle';
 
 const Register = ({ route, navigation }) => {
     const [selectedVehicle, setSelectedVehicle] = useState('tataAce');
+    const [checked, setChecked] = useState(false);
     const [visible, setVisible] = useState(false);
     const [snackBarText, setSnackBarText] = useState('Please fill all the data');
     const [isLoading, setIsLoading] = useState(false);
@@ -64,12 +68,7 @@ const Register = ({ route, navigation }) => {
         setValid(isDataValid);
 
     }, [registeredData]);
-    useEffect(() => {
-        setRegisterData({
-            phone: route.params.phone,
-            ...registeredData
-        })
-    }, [])
+
 
     // Set local storage
     const setDriverLocally = async (id) => {
@@ -138,76 +137,93 @@ const Register = ({ route, navigation }) => {
 
     }
 
+    const handleBackPress = () => {
+
+    }
+
     const onDismissSnackBar = () => setVisible(false);
 
     return (
-        <ScrollView automaticallyAdjustKeyboardInsets={true} style={style.container}>
-            <Provider>
-                <View style={style.mainContainer} onPress={Keyboard.dismiss}>
-                    {isLoading && <AppLoader styles={{ top: '40%' }} />}
-                    <View>
-                        <View style={{ flexDirection: 'column', alignItems: 'center' }} >
-                            <Text style={style.headerText}>Load Go</Text>
-                            <Text style={[style.subHeaderText]} >Create you account </Text>
-                            <Text style={style.smallText}>Welcome to LoadGo, enter your details below to continue.</Text>
-                        </View>
+
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <View style={{ flex: 1 }}>
+                <Appbar.Header style={{ backgroundColor: Colors.bgLight }}>
+                    <Appbar.BackAction size={20} onPress={handleBackPress} />
+                    <Appbar.Content title="Back" titleStyle={{ fontSize: FontSize.medium }} />
+                </Appbar.Header>
+                <View style={[commonStyles.mainContainer, commonStyles.p16]}>
+                    <ScrollView automaticallyAdjustKeyboardInsets={true}>
                         <View>
-                            <AppTextInput
-                                onChangeText={(text) => validateInputs(text, 'driverName')}
-                                value={registeredData.driverName}
-                                height={50}
-                                placeholder="Full Name" />
-                            <AppTextInput
-                                onChangeText={(text) => validateInputs(text, 'email')}
-                                value={registeredData.email}
-                                inputMode="email"
-                                height={50}
-                                placeholder="Email" />
+                            {isLoading && <AppLoader />}
+                            <View>
+                                <Text style={[commonStyles.fnt24Medium, commonStyles.textPrimary, commonStyles.mb24]}>Sign up</Text>
+                                <View style={{ gap: 20 }}>
+                                    <AppTextInput
+                                        onChangeText={(text) => validateInputs(text, 'driverName')}
+                                        value={registeredData.driverName}
+                                        height={50}
+                                        placeholder="Full Name"
+                                    />
+                                    <AppTextInput
+                                        onChangeText={(text) => validateInputs(text, 'email')}
+                                        value={registeredData.email}
+                                        inputMode="email"
+                                        height={50}
+                                        placeholder="Email"
+                                    />
+                                    <View style={style.selectBox}>
+                                        <Picker
+                                            enabled={false}
+                                            selectedValue={selectedVehicle}
+                                            onValueChange={(itemValue) => setSelectedVehicle(itemValue)}
+                                        >
+                                            <Picker.Item label="Tata Ace" value="tataAce" />
+                                        </Picker>
+                                    </View>
+                                    <AppTextInput
+                                        onChangeText={(text) => validateInputs(text, 'vehicleNo')}
+                                        value={registeredData.vehicleNo}
+                                        height={50}
+                                        style={{ textTransform: 'uppercase' }}
+                                        placeholder="Vehicle Number"
+                                    />
+                                    <View style={[commonStyles.rowFlex]}>
+                                        <Checkbox
+                                            status={checked ? 'checked' : 'unchecked'}
+                                            color={Colors.bgPrimary}
+                                            onPress={() => {
+                                                setChecked(!checked);
+                                            }}
+                                        />
+                                        <Text style={[commonStyles.fnt12Regular, { marginTop: 6, flex: 1 }]}>By signing up. you agree to the Terms of service and Privacy policy.</Text>
+                                    </View>
+                                </View>
 
-                            <View style={style.inputStyle}>
-                                <Picker
-                                    enabled={false}
-                                    selectedValue={selectedVehicle}
-                                    onValueChange={(itemValue, itemIndex) =>
-                                        setSelectedVehicle(itemValue)
-                                    }>
-                                    <Picker.Item label="Tata Ace" value="tataAce" />
-                                </Picker>
                             </View>
-
-                            <AppTextInput
-                                onChangeText={(text) => validateInputs(text, 'vehicleNo')}
-                                value={registeredData.vehicleNo}
-                                height={50}
-                                style={{ textTransform: 'uppercase' }}
-                                placeholder="Vehicle Number" />
-
+                            <Snackbar
+                                style={style.snackBar}
+                                visible={visible}
+                                duration={4000}
+                                onDismiss={onDismissSnackBar}
+                                action={{
+                                    label: 'OK',
+                                    labelStyle: { color: '#fff' },
+                                    onPress: () => {
+                                        // Do something
+                                    },
+                                }}
+                            >
+                                {snackBarText}
+                            </Snackbar>
                         </View>
-                        <Text style={style.noteText}>*Vehicle number would be verified after your document verification.</Text>
-                    </View>
-
-                    <TouchableOpacity disabled={!valid} style={[style.signInButton, !valid ? style.signInButtonDisabled : {}]} onPress={validateForm}>
-                        <Text style={[style.signInText, { marginLeft: 30 }]} >Register
-                        </Text>
+                    </ScrollView>
+                    <TouchableOpacity disabled={!valid} style={valid ? commonStyles.btnPrimary : commonStyles.btnDisabled} onPress={validateForm}>
+                        <Text style={[commonStyles.fnt16Medium, commonStyles.textCenter, commonStyles.textWhite]}>Register</Text>
                     </TouchableOpacity>
-                    <Snackbar
-                        style={style.snackBar}
-                        visible={visible}
-                        duration={4000}
-                        onDismiss={onDismissSnackBar}
-                        action={{
-                            label: 'OK',
-                            labelStyle: { color: '#fff' },
-                            onPress: () => {
-                                // Do something
-                            },
-                        }}
-                    >
-                        {snackBarText}
-                    </Snackbar>
                 </View>
-            </Provider>
-        </ScrollView>
+            </View>
+        </TouchableWithoutFeedback>
+
 
     )
 }

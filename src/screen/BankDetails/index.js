@@ -126,17 +126,17 @@ const BankDetails = () => {
             <Provider>
                 {isLoading && <AppLoader styles={{ top: '40%' }} />}
                 <View style={style.mainContainer} onPress={Keyboard.dismiss}>
-                    <View>
+                    <View style={{ gap: 20 }}>
                         <Text style={[style.subHeaderText]} >Account Information: </Text>
                         <AppTextInput
                             onChangeText={(text) => validateInputs(text, 'accountHolderName')}
                             value={bankDetails.accountHolderName}
-                            height={50}
+                            height={30}
                             placeholder="Account Holder Name" />
                         <AppTextInput
                             onChangeText={(text) => validateInputs(text, 'accountNumber')}
                             value={bankDetails.accountNumber}
-                            height={50}
+                            height={30}
                             keyboardType="decimal-pad"
                             placeholder="Account Number" />
                         <View style={style.inputStyle}>
@@ -155,27 +155,27 @@ const BankDetails = () => {
                         <AppTextInput
                             onChangeText={(text) => validateInputs(text, 'bankName')}
                             value={bankDetails.bankName}
-                            height={50}
+                            height={30}
                             placeholder="Bank Name" />
 
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <AppTextInput
                                 onChangeText={(text) => validateInputs(text, 'swiftCode')}
                                 value={bankDetails.swiftCode}
-                                height={50}
+                                height={30}
                                 style={{ width: '48%', textTransform: 'uppercase' }}
                                 placeholder="IFSC CODE" />
                             <AppTextInput
                                 onChangeText={(text) => validateInputs(text, 'bankLocation')}
                                 value={bankDetails.bankLocation}
-                                height={50}
+                                height={30}
                                 style={{ width: '48%' }}
                                 placeholder="City" />
                         </View>
                         <AppTextInput
                             onChangeText={(text) => validateInputs(text, 'branchName')}
                             value={bankDetails.branchName}
-                            height={50}
+                            height={30}
                             style={{ marginBottom: 20 }}
                             placeholder="Branch Name" />
 

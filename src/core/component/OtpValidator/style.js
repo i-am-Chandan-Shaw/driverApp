@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native'
+import Colors from '../../../constants/Colors';
 
 const style = StyleSheet.create({
     modalContainer: {
@@ -31,7 +32,7 @@ const style = StyleSheet.create({
     },
     otpInput: {
         borderWidth: 1,
-        borderColor: '#bbb',
+        borderColor: Colors.bgInfo,
         width: 50,
         height: 50,
         fontSize: 20,
@@ -40,7 +41,7 @@ const style = StyleSheet.create({
         fontWeight:'bold'
     },
     otpInputFilled: {
-        borderColor: '#4773fa',
+        borderColor: Colors.bgPrimary,
     },
     otpInputError: {
         borderColor: 'red',

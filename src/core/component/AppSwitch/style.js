@@ -1,49 +1,55 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
+import { useTheme } from '../../../constants/ThemeContext';
 
-const style = StyleSheet.create({
+const useStyles = () => {
+  const { theme } = useTheme();
+
+  return StyleSheet.create({
     container: {
-        width: 150, // Customize the width of the switch
-        height: 40, // Customize the height of the switch
-        borderRadius: 25, // Half of the height to make it rounded
-        backgroundColor: 'transparent', // Background color of the switch
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 10,
-      },
-      switchTrack: {
-        flex: 1,
-        width:'100%',
-        height: '100%',
-        borderRadius: 25,
-        flexDirection:'row',
-        justifyContent:'space-between',
-        alignItems:'center'
-      },
-      thumb: {
-        width: 35, // Customize the width of the thumb
-        height: 35, // Customize the height of the thumb
-        borderRadius: 20, // Half of the height to make it rounded
-        backgroundColor: '#fff', // Thumb color
-        position: 'absolute',
-        top: 2,
-      },
-      textContainer: {
-        marginLeft: 10,
-      },
-      textLeft: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#fff',
-        left:30 
-      },
-      textRight: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
-        alignSelf:'center',
-        position:'absolute',
-        left:50
-      },
-});
+      width: 130,
+      height: 35,
+      borderRadius: 20,
+      backgroundColor: 'transparent',
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 8,
+    },
+    switchTrack: {
+      flex: 1,
+      width: '100%',
+      height: '100%',
+      borderRadius: 20,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      backgroundColor: theme.bgPrimaryLight,
+    },
+    thumb: {
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      backgroundColor: theme.white,
+      position: 'absolute',
+      top: 2,
+    },
+    textContainer: {
+      marginLeft: 8,
+    },
+    textLeft: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      color: theme.black,
+      left: 25,
+    },
+    textRight: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      color: theme.black,
+      alignSelf: 'center',
+      position: 'absolute',
+      left: 45,
+    },
+  });
+};
 
-export default style;
+export default useStyles;

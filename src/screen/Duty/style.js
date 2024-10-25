@@ -49,8 +49,8 @@ const style = StyleSheet.create({
       width: width
    },
    image: {
-      height: 376,
-      width: 376
+      height: 230,
+      width: 300
    },
    waitingContainer: {
       flexDirection: 'column',
@@ -59,7 +59,7 @@ const style = StyleSheet.create({
       justifyContent: 'center',
    },
    mediumText: {
-      fontSize: 20,
+      fontSize: 16,
       color: '#000',
       fontFamily: "Poppins-SemiBold",
    },
