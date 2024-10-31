@@ -1,21 +1,23 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, Keyboard, ScrollView, TouchableOpacity } from 'react-native';
-import style from './style';;
 import AppTextInput from '../../core/component/AppTextInput';
-import { Picker } from '@react-native-picker/picker';
-import { Snackbar, Provider, ActivityIndicator } from 'react-native-paper';
+import { Snackbar, Provider } from 'react-native-paper';
 import { get, patch } from '../../core/helper/services';
 import { AppContext } from '../../core/helper/AppContext';
 import AppLoader from '../../core/component/AppLoader';
+import commonStyles from '../../constants/commonStyle';
+import { useTheme } from '../../constants/ThemeContext';
+import useFontStyles from "../../constants/fontStyle";
 
 const BankDetails = () => {
-    const { globalData, setGlobalData } = useContext(AppContext)
+    const { theme } = useTheme();
+    const fontStyles = useFontStyles();
+    const { globalData } = useContext(AppContext);
 
-    const [accountType, setAccountType] = useState('saving');
-    const [visible, setVisible] = useState(false);
-    const [snackBarText, setSnackBarText] = useState('Please fill all the data');
+    const [isSnackbarVisible, setIsSnackbarVisible] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('Please fill all the data');
     const [isLoading, setIsLoading] = useState(false);
-    const [valid, setValid] = useState(false);
+    const [isFormValid, setIsFormValid] = useState(false);
     const [bankDetails, setBankDetails] = useState({
         id: globalData?.driverId,
         accountHolderName: '',
@@ -24,190 +26,183 @@ const BankDetails = () => {
         branchName: '',
         swiftCode: '',
         bankLocation: '',
-        accountType: accountType
+        accountType: 'Savings'
     });
 
     useEffect(() => {
-        setDriverLocally(globalData?.driverId);
-        setValid(isDataValid)
-    }, [])
+        fetchDriverDetails(globalData?.driverId);
+        validateForm();
+    }, []);
 
     useEffect(() => {
-        setValid(isDataValid)
-    }, [bankDetails])
+        validateForm();
+    }, [bankDetails]);
+
+    const fetchDriverDetails = async (driverId) => {
+        setIsLoading(true);
+        try {
+            const queryParameter = `?driverId=${driverId}`;
+            const data = await get('getDriver', queryParameter);
+            if (data?.length) {
+                const { accountHolderName = '', bankName = '', accountNumber = '', branchName = '', swiftCode = '', bankLocation = '', accountType = '' } = data[0];
+
+                setBankDetails({
+                    id: driverId,
+                    accountHolderName,
+                    bankName,
+                    accountNumber: accountNumber === 0 ? '' : accountNumber,
+                    branchName,
+                    swiftCode,
+                    bankLocation,
+                    accountType: 'Savings'
+                });
+            }
+
+        } catch (error) {
+            // Handle error if needed
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const updateBankDetails = async () => {
         setIsLoading(true);
         Keyboard.dismiss();
         try {
-            const data = await patch(bankDetails, 'patchDriver');
-            if (data) {
-                setSnackBarText('Bank Details Updated')
-                setVisible(true)
-                setIsLoading(false);
-                setValid(false)
-
-            }
+            await patch(bankDetails, 'patchDriver');
+            setSnackbarMessage('Bank Details Updated');
+            setIsSnackbarVisible(true);
+            setIsFormValid(false);
         } catch (error) {
-            console.log('updateBankDetails',error);
+            // Handle error if needed
+        } finally {
             setIsLoading(false);
         }
+    };
 
-
-    }
-
-    const setDriverLocally = async (id) => {
-        setIsLoading(true)
-        const queryParameter = '?driverId=' + id.toString()
-        try {
-            const data = await get('getDriver', queryParameter);
-            if (data) {
-                setBankDetails({
-                    id: globalData?.driverId,
-                    accountHolderName: data[0].accountHolderName,
-                    bankName: data[0].bankName,
-                    accountNumber: data[0].accountNumber == 0 ? '' : data[0].accountNumber,
-                    branchName: data[0].branchName,
-                    swiftCode: data[0].swiftCode,
-                    bankLocation: data[0].bankLocation,
-                    accountType: data[0].accountType == '' ? accountType : data[0].accountType
-                })
-                setIsLoading(false);
-
-            }
-        } catch (error) {
-            console.log(error);
-            setIsLoading(false)
+    const handleInputChange = (value, field) => {
+        const nameRegex = /^[a-zA-Z\s]*$/;
+        if (['accountNumber', 'swiftCode'].includes(field)) {
+            setBankDetails((prev) => ({
+                ...prev,
+                [field]: field === 'accountNumber' ? value.replace(/[^0-9]/g, '') : value
+            }));
+        } else if (nameRegex.test(value)) {
+            setBankDetails((prev) => ({
+                ...prev,
+                [field]: value
+            }));
         }
-    }
+    };
 
-    const validateInputs = (text, type) => {
-
-        let nameRegex = /^[a-zA-Z\s]*$/;
-        if ((type != 'accountNumber' || type != 'swiftCode') && nameRegex.test(text)) {
-            setBankDetails({
-                ...bankDetails,
-                [type]: text
-            });
-        } else if (type == 'accountNumber' || type == 'swiftCode') {
-            if (type == 'accountNumber') {
-                setBankDetails({
-                    ...bankDetails,
-                    [type]: text.replace(/[^0-9]/g, '')
-                });
-            } else {
-                setBankDetails({
-                    ...bankDetails,
-                    [type]: text
-                });
-            }
-
-        }
+    const validateForm = () => {
+        const isValid = Object.values(bankDetails).every((field) => field !== '');
+        setIsFormValid(isValid);
+    };
 
 
-
-
-    }
-
-    const isDataValid = () => {
-        let isValid = true;
-        for (let item in bankDetails) {
-            if (bankDetails[item] == '') {
-                isValid = false;
-            }
-        }
-        return isValid
-    }
-
-    const onDismissSnackBar = () => setVisible(false);
+    const dismissSnackbar = () => setIsSnackbarVisible(false);
 
     return (
-        <ScrollView automaticallyAdjustKeyboardInsets={true} style={style.container}>
-            <Provider>
-                {isLoading && <AppLoader styles={{ top: '40%' }} />}
-                <View style={style.mainContainer} onPress={Keyboard.dismiss}>
-                    <View style={{ gap: 20 }}>
-                        <Text style={[style.subHeaderText]} >Account Information: </Text>
+        <ScrollView automaticallyAdjustKeyboardInsets={true} style={[commonStyles.mainContainer, commonStyles.p16, { backgroundColor: theme.bgLight }]}>
+            <Provider >
+                {isLoading && <AppLoader />}
+                <View style={{ flex: 1, justifyContent: 'space-between' }}>
+                    <View style={{ gap: 20, }}>
+                        <Text style={{ color: theme.textPrimary }}>Account Information:</Text>
                         <AppTextInput
-                            onChangeText={(text) => validateInputs(text, 'accountHolderName')}
+                            onChangeText={(text) => handleInputChange(text, 'accountHolderName')}
                             value={bankDetails.accountHolderName}
                             height={30}
-                            placeholder="Account Holder Name" />
+                            placeholder="Account Holder Name"
+                            placeholderTextColor={theme.textTertiary}
+                        />
                         <AppTextInput
-                            onChangeText={(text) => validateInputs(text, 'accountNumber')}
+                            onChangeText={(text) => handleInputChange(text, 'accountNumber')}
                             value={bankDetails.accountNumber}
                             height={30}
                             keyboardType="decimal-pad"
-                            placeholder="Account Number" />
-                        <View style={style.inputStyle}>
+                            placeholder="Account Number"
+                            placeholderTextColor={theme.textTertiary}
+                        />
+                        {/* <View style={style.inputStyle}>
                             <Picker
                                 style={{ position: 'relative', top: -5 }}
                                 selectedValue={accountType}
-                                onValueChange={(itemValue, itemIndex) =>
-                                    setAccountType(itemValue)
-                                }>
+                                onValueChange={(value) => setAccountType(value)}
+                            >
                                 <Picker.Item label="Saving" value="saving" />
                                 <Picker.Item label="Current" value="current" />
                             </Picker>
-                        </View>
+                            </View> */}
 
-                        <Text style={[style.subHeaderText]} >Bank Information: </Text>
+                        <Text style={{ color: theme.textPrimary }}>Bank Information:</Text>
                         <AppTextInput
-                            onChangeText={(text) => validateInputs(text, 'bankName')}
+                            onChangeText={(text) => handleInputChange(text, 'bankName')}
                             value={bankDetails.bankName}
                             height={30}
-                            placeholder="Bank Name" />
+                            placeholder="Bank Name"
+                            placeholderTextColor={theme.textTertiary}
+                        />
 
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 16 }}>
                             <AppTextInput
-                                onChangeText={(text) => validateInputs(text, 'swiftCode')}
+                                onChangeText={(text) => handleInputChange(text, 'swiftCode')}
                                 value={bankDetails.swiftCode}
                                 height={30}
-                                style={{ width: '48%', textTransform: 'uppercase' }}
-                                placeholder="IFSC CODE" />
+                                style={{ flex: 1, textTransform: 'uppercase' }}
+                                placeholderTextColor={theme.textTertiary}
+                            />
                             <AppTextInput
-                                onChangeText={(text) => validateInputs(text, 'bankLocation')}
+                                onChangeText={(text) => handleInputChange(text, 'bankLocation')}
                                 value={bankDetails.bankLocation}
                                 height={30}
-                                style={{ width: '48%' }}
-                                placeholder="City" />
+                                style={{ flex: 1 }}
+                                placeholder="City"
+                                placeholderTextColor={theme.textTertiary}
+                            />
                         </View>
+
                         <AppTextInput
-                            onChangeText={(text) => validateInputs(text, 'branchName')}
+                            onChangeText={(text) => handleInputChange(text, 'branchName')}
                             value={bankDetails.branchName}
                             height={30}
-                            style={{ marginBottom: 20 }}
-                            placeholder="Branch Name" />
+                            placeholder="Branch Name"
+                            placeholderTextColor={theme.textTertiary}
+                        />
 
-                        <Text style={style.noteText}>*By adding this bank account, I agree to T&Cs regarding topping up from bank account..</Text>
+                        <Text style={[{ color: theme.textPrimary, marginBottom:16 }, fontStyles.fnt12Regular]}>
+                            *By adding this bank account, I agree to T&Cs regarding topping up from bank account.
+                        </Text>
                     </View>
 
-                    <TouchableOpacity disabled={!valid} style={[style.signInButton, !valid ? style.signInButtonDisabled : {}]} onPress={updateBankDetails}>
-                        <View style={{ width: 30 }} />
-                        <Text style={style.signInText} >{bankDetails.accountNumber.length == 0 ? 'Add Bank Account' : 'Update Bank Account'}
+                    <TouchableOpacity
+                        disabled={!isFormValid}
+                        style={[isFormValid ? commonStyles.btnPrimary : commonStyles.btnDisabled]}
+                        onPress={updateBankDetails}
+                    >
+                        <Text style={[{ color: theme.btnText}, fontStyles.fnt16Medium]}>
+                            {bankDetails.accountNumber.length === 0 ? 'Add Bank Account' : 'Update Bank Account'}
                         </Text>
                     </TouchableOpacity>
+
                     <Snackbar
-                        style={style.snackBar}
-                        visible={visible}
+                        style={{ backgroundColor: theme.bgPrimary }}
+                        visible={isSnackbarVisible}
                         duration={4000}
-                        onDismiss={onDismissSnackBar}
+                        onDismiss={dismissSnackbar}
                         action={{
                             label: 'OK',
                             labelStyle: { color: '#fff' },
-                            onPress: () => {
-                                // Do something
-                            },
+                            onPress: () => { },
                         }}
                     >
-                        {snackBarText}
+                        {snackbarMessage}
                     </Snackbar>
                 </View>
-
             </Provider>
         </ScrollView>
-
-    )
-}
+    );
+};
 
 export default BankDetails;

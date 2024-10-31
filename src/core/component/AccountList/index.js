@@ -6,181 +6,155 @@ import MatIcon from 'react-native-vector-icons/MaterialIcons';
 import FAIcon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useTheme } from '../../../constants/ThemeContext';
+import useFontStyles from '../../../constants/fontStyle';
 
 const AccountList = ({ driverData }) => {
-
-  const [data, setData] = useState(null)
+  const { theme } = useTheme();
+  const fontStyles = useFontStyles();
+  const [data, setData] = useState(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
-    setData(driverData)
-    console.log({ driverData });
-  }, [driverData])
-
-  const navigation = useNavigation()
+    setData(driverData);
+  }, [driverData]);
 
   const logout = async () => {
-
     try {
       await AsyncStorage.setItem('isLoggedIn', 'false');
-      console.log('Data saved successfully!');
-      navigation.replace('Login')
+      navigation.replace('Login');
     } catch (error) {
-      console.log('Error saving data:', error);
+      console.error('Error logging out:', error);
     }
-  }
+  };
 
   const callSupport = () => {
-    Linking.openURL(`tel:${3361218798}`)
-
-  }
-
-  const noop = () => { }
+    Linking.openURL(`tel:${3361218798}`);
+  };
 
   const onShare = async () => {
     try {
       const result = await Share.share({
-        message:
-          'Deliver your goods at the best price,at the fastest time possible. Book your first service at Flat 200 Rs Off..! Visit the link to know more: www.loadgo.in',
+        message: 'Deliver your goods at the best price, at the fastest time possible. Book your first service at Flat 200 Rs Off..! Visit the link to know more: www.loadgo.in',
       });
-      if (result.action === Share.sharedAction) {
-        if (result.activityType) {
-          // shared with activity type of result.activityType
-        } else {
-          // shared
-        }
-      } else if (result.action === Share.dismissedAction) {
-        // dismissed
+      if (result.action === Share.dismissedAction) {
+        // Handle dismissal case
       }
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert('Error', error.message);
     }
   };
 
-  const openVerificationScreen = () => {
-    navigation.navigate('Verification')
-  }
+  const navigateToScreen = (screen) => {
+    navigation.navigate(screen);
+  };
 
-  const openTermsAndCondition = () => {
-    navigation.navigate('TermsAndConditions')
-  }
-
-  const openBankDetailsScreen = () => {
-    navigation.navigate('BankDetails')
-  }
-
-  const listItemDetails = [
+  const listItems = [
     {
       id: 0,
       title: 'Verification',
-      description: '',
       icon: 'verified',
-      iconColor: '#fff',
       backgroundColor: '#0B6623',
       buttonText: '',
       buttonType: '',
       buttonColor: '',
       nextPage: true,
-      onPress: openVerificationScreen
+      onPress: () => navigateToScreen('Verification'),
+      iconComponent: MatIcon,
     },
     {
       id: 6,
       title: 'Bank Details',
-      description: '',
       icon: 'bank',
-      iconColor: '#fff',
       backgroundColor: '#EA906C',
       buttonText: '',
       buttonType: '',
       buttonColor: '',
       nextPage: true,
-      onPress: openBankDetailsScreen
+      onPress: () => navigateToScreen('BankDetails'),
+      iconComponent: FAIcon,
     },
     {
       id: 1,
       title: 'Invite',
-      description: 'Invite Code is ' + data?.inviteCode,
+      description: `Invite Code is ${data?.inviteCode}`,
       icon: 'gift',
-      iconColor: '#fff',
       backgroundColor: '#EBB02D',
       buttonText: 'Invite',
       buttonType: 'outlined',
       buttonColor: '',
       nextPage: false,
-      onPress: onShare
+      onPress: onShare,
     },
     {
       id: 2,
       title: 'Support',
       description: 'For queries and help',
       icon: 'message-circle',
-      iconColor: '#fff',
       backgroundColor: '#57C5B6',
       buttonText: 'Call',
       buttonType: 'outlined',
       buttonColor: '#0047ab',
       nextPage: false,
-      onPress: callSupport
+      onPress: callSupport,
     },
     {
       id: 3,
       title: 'Terms & Conditions',
-      description: '',
       icon: 'alert-circle',
-      iconColor: '#fff',
       backgroundColor: '#62CDFF',
       buttonText: '',
       buttonType: '',
       buttonColor: '',
       nextPage: true,
-      onPress: openTermsAndCondition
+      onPress: () => navigateToScreen('TermsAndConditions'),
     },
     {
       id: 4,
       title: 'Logout',
-      description: '',
       icon: 'power',
-      iconColor: '#fff',
       backgroundColor: '#FF6969',
       buttonText: '',
       buttonType: '',
       buttonColor: '',
       nextPage: false,
-      onPress: logout
+      onPress: logout,
     },
-  ]
-  let listArr = listItemDetails.map(item => (
+  ];
+
+  const renderIcon = (item) => {
+    const IconComponent = item.iconComponent || FeatherIcon;
+    return <IconComponent name={item.icon} color="#fff" size={18} />;
+  };
+
+  const renderListItems = listItems.map((item) => (
     <View key={item.id}>
-      <Pressable android_ripple={{ color: '#eee', borderless: false }} onPress={item.onPress ? item.onPress : noop}>
+      <Pressable onPress={item.onPress} android_ripple={{ color: '#eee', borderless: false }}>
         <View style={style.list}>
           <View style={style.leftSection}>
-            <View style={[style.listIcon, { backgroundColor: item.backgroundColor }]} >
-              {(item.title != 'Verification' && item.title != 'Bank Details') && <FeatherIcon name={item.icon} color="#fff" size={18} />}
-              {item.title == 'Verification' && <MatIcon name={item.icon} color="#fff" size={18} />}
-              {item.title == 'Bank Details' && <FAIcon name={item.icon} color="#fff" size={13} />}
+            <View style={[style.listIcon, { backgroundColor: item.backgroundColor }]}>
+              {renderIcon(item)}
             </View>
             <View>
-              <Text style={style.listTitle}>{item.title}</Text>
-              {item.description && (<Text style={style.listDescription}>{item.description}</Text>)}
+              <Text style={[{ color: theme.bgDark }, fontStyles.fnt16Regular]}>{item.title}</Text>
+              {item.description && (
+                <Text style={[{ color: theme.bgDark }, fontStyles.fnt12Regular]}>{item.description}</Text>
+              )}
             </View>
           </View>
           <View style={style.rightSection}>
-            {item.buttonText && (<View style={style.button}  activeOpacity={0.7}>
-              <Text style={style.buttonText}>{item.buttonText}</Text>
+            {item.buttonText && (<View style={style.button} activeOpacity={0.7}>
+              <Text style={{ color: theme.bgDark }}>{item.buttonText}</Text>
             </View>)}
-            {item.nextPage && <FeatherIcon name='chevron-right' size={18} />}
+            {item.nextPage && <FeatherIcon name='chevron-right' color={theme.bgDark} size={18} />}
           </View>
+          
         </View>
-      </Pressable >
-    </View >
-  ))
-
-
-  return (
-    <View style={{ marginTop: 20 }}>
-      {listArr}
+      </Pressable>
     </View>
-  )
-}
+  ));
+
+  return <View>{renderListItems}</View>;
+};
 
 export default AccountList;

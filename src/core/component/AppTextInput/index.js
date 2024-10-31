@@ -25,10 +25,11 @@ const AppTextInput = ({ style, type, height, ...otherProps }) => {
                     backgroundColor: theme.bgLight,
                     borderRadius: Spacing,
                     borderWidth: 1,
-                    borderColor: theme.bgInfo,
+                    borderColor: theme.borderColor,
                     textAlignVertical: 'center',
                     width: '100%',
-                    lineHeight: 23
+                    lineHeight: 23,
+                    color:theme.bgDark
 
                 },
                 focused && {

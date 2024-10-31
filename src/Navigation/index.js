@@ -19,11 +19,14 @@ import LiveTracking from '../screen/LiveTracking';
 import RatingScreen from '../screen/RatingScreen';
 import { get } from '../core/helper/services';
 import TermsAndConditions from '../screen/TermsAndConditions';
+import { useTheme } from '../constants/ThemeContext';
+
 
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
-  const { globalData, setGlobalData } = useContext(AppContext)
+  const { theme } = useTheme();
+  const { setGlobalData } = useContext(AppContext)
   useEffect(() => {
     getDataFromStorage('driverId');
   }, []);
@@ -73,7 +76,12 @@ const Navigation = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Intro" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName="Intro" screenOptions={{
+        headerShown: false, headerStyle: {
+          backgroundColor: theme.bgLight,
+        },
+        headerTintColor: theme.bgDark, 
+      }}>
         <Stack.Screen name="Intro" component={SplashScreen} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />

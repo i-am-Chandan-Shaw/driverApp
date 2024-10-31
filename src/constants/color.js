@@ -19,33 +19,35 @@ const lightTheme = {
   blue: "#5470F2",
   gray: "#ECECEC",
   lightBlue: "#f1f4ff",
-  borderColor:"#B8B8B8",
+  borderColor: "#B8B8B8",
   borderWithOpacity: "#1f41bb",
+  btnText: '#000000'
 };
 
 // Dark Theme Colors
 const darkTheme = {
-  bgPrimary: '#EDAE10',            // Keep primary color the same
-  bgPrimaryLight: '#4A3B07',       // Darker variant of primary light
-  bgSecondary: '#8A002E',          // Darker shade for secondary
-  bgWarning: '#E67E00',            // Darker tone for warning
-  bgLight: '#1C1C1C',              // Use a very dark gray instead of white
-  bgDark: '#FFFFFF',               // True black for background
-  bgError: '#D32F2F',              // Darker error color
-  bgInfo: '#3C3C3C',               // Dark background for info
-  textPrimary: '#E0E0E0',          // Lighter gray for primary text
-  textSecondary: '#B0B0B0',        // Medium gray for secondary text
-  textTertiary: '#8F8F8F',         // Slightly lighter for tertiary text
-  textDisabled: '#6E6E6E',         // Dark gray for disabled text
-  textInfo: '#7A7A7A',             // For informational text
-  white: "#ffffff",                // White remains the same
-  black: "#000000",                // Black remains the same
-  dark: "#2C2C2C",                 // Darker gray for UI elements
-  blue: "#6A7FF0",                 // Slightly lighter blue for better contrast
-  gray: "#3A3A3A",                 // Darker gray for borders/backgrounds
-  lightBlue: "#1A2238",  
-  borderColor:"#D0D0D0",          // Darkened blue for contrast in dark mode
-  borderWithOpacity: "rgba(31, 65, 187, 0.5)", // Adjust opacity for better contrast
+  bgPrimary: '#EDAE10',
+  bgPrimaryLight: '#4A3B07',
+  bgSecondary: '#8A002E',
+  bgWarning: '#E67E00',
+  bgLight: '#1C1C1C',
+  bgDark: '#FFFFFF',
+  bgError: '#D32F2F',
+  bgInfo: '#3C3C3C',
+  borderColor: '#FFFF',
+  textPrimary: '#E0E0E0',
+  textSecondary: '#B0B0B0',
+  textTertiary: '#8F8F8F',
+  textDisabled: '#6E6E6E',
+  textInfo: '#7A7A7A',
+  white: "#ffffff",
+  black: "#000000",
+  dark: "#2C2C2C",
+  blue: "#6A7FF0",
+  gray: "#3A3A3A",
+  borderColor: "#D0D0D0",
+  btnText: '#FFFFFF',
+  borderWithOpacity: "rgba(31, 65, 187, 0.5)",
 };
 
 export { lightTheme, darkTheme };

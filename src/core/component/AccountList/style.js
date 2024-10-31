@@ -6,8 +6,7 @@ const style = StyleSheet.create({
       justifyContent: 'space-between',
       alignItems: 'center',
       paddingHorizontal: 10,
-      paddingVertical: 12,
-
+      paddingVertical: 16,
    },
    leftSection: {
       paddingHorizontal: 10,
@@ -20,8 +19,8 @@ const style = StyleSheet.create({
       alignItems: 'center',
    },
    listIcon: {
-      height: 30,
-      width: 30,
+      height: 40,
+      width: 40,
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
@@ -30,7 +29,7 @@ const style = StyleSheet.create({
       marginRight: 15
    },
    listTitle: {
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: 500,
       color: '#333'
    },
@@ -44,9 +43,9 @@ const style = StyleSheet.create({
       borderWidth: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      paddingHorizontal: 12,
+      paddingHorizontal: 16,
       backgroundColor: 'transparent',
-      borderRadius:15
+      borderRadius:14
    },
    buttonText: {
       fontSize: 12,

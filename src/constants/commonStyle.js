@@ -10,7 +10,9 @@ const commonStyles = StyleSheet.create({
         padding: 15,
         backgroundColor: Colors.bgPrimary,
         borderRadius: 8,
-        width: '100%'
+        width: '100%',
+        flexDirection:'row',
+        justifyContent:'center'
     },
     btnOutline: {
         padding: 15,
