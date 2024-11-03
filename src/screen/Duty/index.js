@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, Linking, Dimensions, Image, Text, TouchableOpacity, Pressable, AppState } from 'react-native';
 import { getAddressFromCoordinates, getCurrentLocation, locationPermission } from '../../core/helper/helper';
+import { useColorScheme } from 'react-native';
 import MapView, { Marker, Circle } from 'react-native-maps';
 import LocationAccess from '../LocationAccess';
 import imagePath from '../../constants/imagePath';
@@ -17,7 +18,8 @@ import { AppContext } from '../../core/helper/AppContext';
 import messaging from '@react-native-firebase/messaging';
 import { Snackbar } from 'react-native-paper';
 import WebViewBanner from '../../core/component/Promotion-Banner/WebViewBanner';
-
+import { useTheme } from "../../constants/ThemeContext";
+import useFontStyles from "../../constants/fontStyle";
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -25,7 +27,16 @@ const LATITUDE_DELTA = 0.1522;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 
+
+
 const Duty = () => {
+
+    const { theme } = useTheme()
+    const fontStyles = useFontStyles();
+
+
+
+
     const [locationAccessed, setLocationAccess] = useState(false);
     const [isDutyOn, setDuty] = useState(false);
     const [currentAddress, setCurrentAddress] = useState('Unknown')
@@ -51,31 +62,52 @@ const Duty = () => {
     const mapRef = useRef();
     let timeout;
     let waitForTripStatus;
+    
+    useEffect(() => {
+        const handleAppStateChange = (nextAppState) => {
+            const activeState = nextAppState === 'active' ? 1 : 0;
+            const payload = {
+                id: globalData?.driverData[0]?.id,
+                active: activeState,
+            };
+            updateDriver(payload);
+            console.log("App State changed to:", nextAppState);
+            setAppState(nextAppState);
+        };
+
+        AppState.addEventListener('change', handleAppStateChange);
+
+        return () => {
+            AppState.removeEventListener('change', handleAppStateChange);
+        };
+    }, [globalData, updateDriver]);
 
     useEffect(() => {
-        getUserLocation(false);
-        // changeTripStatus();
-        getDeviceToken()
-        // trackLive()
-        getTripId();
+        initializeApp();
     }, []);
 
+    const initializeApp = async () => {
+        getUserLocation(false);
+        getDeviceToken();
+        getTripId();
+    };
 
     const getDeviceToken = async () => {
         try {
-            let token = await messaging().getToken();
-            if (token)
-                updatePushToken(token)
+            const token = await messaging().getToken();
+            if (token) {
+                const payload = {
+                    id: globalData?.driverData[0]?.id,
+                    pushToken: token,
+                };
+                updateDriver(payload);
+            }
         } catch (error) {
-            console.log(error);
+            console.error("Error fetching device token:", error);
         }
-    }
+    };
 
-    const updatePushToken = async (token) => {
-        let payload = {
-            id: globalData?.driverData[0].id,
-            pushToken: token
-        }
+    const updateDriver=async(payload)=>{
         try {
             const data = await patch(payload, 'patchDriver');
             if (data) {
@@ -84,8 +116,6 @@ const Duty = () => {
         } catch (error) {
             console.log('updatePushToken', error);
         }
-
-
     }
 
 
@@ -226,7 +256,7 @@ const Duty = () => {
         try {
             setLocationAccess(false);
             const status = await locationPermission();
-            if (status == 'granted') {
+            if (status === 'granted') {
                 setLocationAccess(true);
                 const { latitude, longitude } = await getCurrentLocation();
                 if (latitude && longitude) {
@@ -242,6 +272,16 @@ const Duty = () => {
                         latitudeDelta: LATITUDE_DELTA,
                         longitudeDelta: LONGITUDE_DELTA,
                     }
+
+                    let payload = {
+                        id: globalData?.driverData[0].id,
+                        currentLocation: {
+                            lat: latitude.toString(),
+                            lng: longitude.toString()
+                          },
+                          active:1
+                    }
+                    updateDriver(payload)
                     setGlobalData('currentLocation', coords)
                     return (coords)
                 })
@@ -326,9 +366,9 @@ const Duty = () => {
                     <AppSwitch toggleSwitch={toggleSwitch} />
                 </View>}
                 {isLoading && <AppLoader styles={{ top: 300 }} />}
-                {!isDutyOn && <View style={style.waitingContainer}>
+                {!isDutyOn && <View style={[style.waitingContainer, {backgroundColor:theme.bgLight}]}>
                     <Image style={style.image} source={imagePath.van} />
-                    <Text style={[style.mediumText,{marginTop:30}]}>Go ON DUTY to start earning !  </Text>
+                    <Text style={[fontStyles.fnt16Medium]}>Go ON DUTY to start earning !  </Text>
                 </View>}
                 {/* On Duty */}
 
@@ -338,11 +378,11 @@ const Duty = () => {
                     <TripCard sendData={updatedData} cardData={availableTrips}></TripCard>
                 </View>}
 
-                <WebViewBanner
+                {/* <WebViewBanner
                     visible={isModalVisible}
                     onClose={toggleModal}
                     contentUrl="https://reactnative.dev/docs/running-on-device"
-                />
+                /> */}
 
                 {/* Map */}
                 {isDutyOn && (<MapView ref={mapRef} style={style.mapContainer}

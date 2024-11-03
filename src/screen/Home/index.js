@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Provider as PaperProvider, BottomNavigation } from 'react-native-paper';
 import Account from "../Account";
 import Incentive from "../Incentive";
@@ -11,21 +11,21 @@ const Home = () => {
 
     const { theme } = useTheme()
 
-    const [index, setIndex] = React.useState(0);
+    const [index, setIndex] = useState(0)
 
     const [routes] = React.useState([
         { key: 'dashboard', title: 'Home', focusedIcon: 'home', color: 'red', unfocusedIcon: 'home' },
         { key: 'incentives', title: 'Incentives', focusedIcon: 'gift', unfocusedIcon: 'gift-outline' },
         { key: 'earnings', title: 'Earnings', focusedIcon: 'cash' },
-        { key: 'accounts', title: 'Account', data: { id: 23 }, focusedIcon: 'account' },
+        { key: 'accounts', title: 'Account', focusedIcon: 'account' },
     ]);
 
     return (
         <PaperProvider>
             <BottomNavigation
                 navigationState={{ index, routes }}
-                barStyle={{ backgroundColor: '#fff' }}
-                inactiveColor="#000"
+                barStyle={{ backgroundColor: theme.bgLight}}
+                inactiveColor={theme.bgDark}
                 activeColor={theme.bgPrimary}
                 theme={{ colors: { secondaryContainer: 'transparent' } }}
                 onIndexChange={setIndex}

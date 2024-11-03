@@ -44,7 +44,7 @@ const BankDetails = () => {
             const queryParameter = `?driverId=${driverId}`;
             const data = await get('getDriver', queryParameter);
             if (data?.length) {
-                const { accountHolderName = '', bankName = '', accountNumber = '', branchName = '', swiftCode = '', bankLocation = '', accountType = '' } = data[0];
+                const { accountHolderName = '', bankName = '', accountNumber = '', branchName = '', swiftCode = '', bankLocation = '' } = data[0];
 
                 setBankDetails({
                     id: driverId,
@@ -125,16 +125,6 @@ const BankDetails = () => {
                             placeholder="Account Number"
                             placeholderTextColor={theme.textTertiary}
                         />
-                        {/* <View style={style.inputStyle}>
-                            <Picker
-                                style={{ position: 'relative', top: -5 }}
-                                selectedValue={accountType}
-                                onValueChange={(value) => setAccountType(value)}
-                            >
-                                <Picker.Item label="Saving" value="saving" />
-                                <Picker.Item label="Current" value="current" />
-                            </Picker>
-                            </View> */}
 
                         <Text style={{ color: theme.textPrimary }}>Bank Information:</Text>
                         <AppTextInput
@@ -187,7 +177,7 @@ const BankDetails = () => {
                     </TouchableOpacity>
 
                     <Snackbar
-                        style={{ backgroundColor: theme.bgPrimary }}
+                        style={{ backgroundColor: theme.bgSecondary }}
                         visible={isSnackbarVisible}
                         duration={4000}
                         onDismiss={dismissSnackbar}

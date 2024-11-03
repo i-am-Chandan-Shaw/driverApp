@@ -27,7 +27,9 @@ const commonStyles = StyleSheet.create({
         backgroundColor: Colors.bgPrimary,
         borderRadius: 8,
         opacity: 0.5,
-        width: '100%'
+        width: '100%',
+        flexDirection:'row',
+        justifyContent:'center'
     },
     // Button Css Ends
 
@@ -133,6 +135,24 @@ const commonStyles = StyleSheet.create({
         paddingBottom: 12
     },
 
+    // Margin
+
+    mt10: {
+        margiTop: 10
+    },
+    mt12: {
+        margiTop: 12
+    },
+    mt16: {
+        margiTop: 16
+    },
+    mt30: {
+        margiTop: 30
+    },
+    mt24: {
+        margiTop: 24
+    },
+
     mb10: {
         marginBottom: 10
     },
@@ -151,6 +171,12 @@ const commonStyles = StyleSheet.create({
 
     // Spacing and Margin ends;
 
+    flexCenter: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent:'center',
+        flex: 1
+    },
     rowFlex: {
         flexDirection: 'row'
     },

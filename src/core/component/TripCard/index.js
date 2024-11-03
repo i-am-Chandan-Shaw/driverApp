@@ -9,12 +9,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TripCard = ({ cardData, sendData, userData }) => {
     const [renderedData, setRenderedData] = useState([cardData[0]]);
-    const { globalData, setGlobalData } = useContext(AppContext);
+    const { globalData } = useContext(AppContext);
     const [isLoading, setIsLoading] = useState(false);
 
     const navigation = useNavigation();
     useEffect(() => {
-        console.log(globalData.driverId);
+        console.log('===>',cardData);
         let currentIndex = 1;
         const interval = setInterval(() => {
             if (currentIndex < cardData.length) {

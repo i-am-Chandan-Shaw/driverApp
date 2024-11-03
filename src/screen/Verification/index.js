@@ -265,9 +265,9 @@ const Verification = () => {
     useEffect(() => {
         console.log(globalData.driverId);
 
-        if (globalData.driverData[0].isVerified == '2') {
-            setIsSubmitted(true);
-        }
+        // if (globalData.driverData[0].isVerified == '2') {
+        //     setIsSubmitted(true);
+        // }
     }, [])
 
 
