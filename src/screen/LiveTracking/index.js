@@ -112,7 +112,7 @@ const LiveTracking = (props) => {
             const status = await locationPermission()
             if (status == 'granted') {
                 const { latitude, longitude } = await getCurrentLocation();
-                updateCurrentLoc(globalData?.driverData[0].id, latitude, longitude);
+                updateCurrentLoc(globalData?.driverData.id, latitude, longitude);
                 animate(latitude, longitude);
 
             }

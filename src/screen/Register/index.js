@@ -1,231 +1,269 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, Keyboard, ScrollView, TouchableOpacity, Alert, TouchableWithoutFeedback } from 'react-native';
-import style from './style';;
-import AppTextInput from '../../core/component/AppTextInput';
-import { Picker } from '@react-native-picker/picker';
-import { Snackbar, Checkbox, Appbar } from 'react-native-paper';
-import { post, get } from '../../core/helper/services';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AppContext } from '../../core/helper/AppContext';
-import AppLoader from '../../core/component/AppLoader';
-import Colors from '../../constants/Colors';
-import FontSize from '../../constants/FontSize';
-import commonStyles from '../../constants/commonStyle';
+import React, { useContext, useState, useCallback } from "react";
+import {
+  View,
+  Text,
+  Keyboard,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  TouchableWithoutFeedback,
+} from "react-native";
+import style from "./style";
+import AppTextInput from "../../core/component/AppTextInput";
+import { Picker } from "@react-native-picker/picker";
+import { Snackbar, Checkbox, Appbar } from "react-native-paper";
+import { post, get } from "../../core/helper/services";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AppContext } from "../../core/helper/AppContext";
+import AppLoader from "../../core/component/AppLoader";
+import Colors from "../../constants/Colors";
+import commonStyles from "../../constants/commonStyle";
+import { useTheme } from "../../constants/ThemeContext";
+import { DriverEnum } from "../../constants/enums";
+import { useNavigation } from "@react-navigation/native";
 
-const Register = ({ route, navigation }) => {
-    const [selectedVehicle, setSelectedVehicle] = useState('tataAce');
-    const [checked, setChecked] = useState(false);
-    const [visible, setVisible] = useState(false);
-    const [snackBarText, setSnackBarText] = useState('Please fill all the data');
-    const [isLoading, setIsLoading] = useState(false);
-    const [valid, setValid] = useState(false);
-    const { globalData, setGlobalData } = useContext(AppContext)
-    const [registeredData, setRegisterData] = useState({
-        driverName: '',
-        email: '',
-        vehicleType: selectedVehicle,
-        vehicleNo: ''
-    });
+const Register = ({ route }) => {
+  const { theme } = useTheme();
+  const navigation = useNavigation();
+  const [selectedVehicle, setSelectedVehicle] = useState("tataAce");
+  const [checked, setChecked] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [snackBarText, setSnackBarText] = useState("Please fill all the data");
+  const [isLoading, setIsLoading] = useState(false);
+  const { setGlobalData } = useContext(AppContext);
 
-    const handleAlertOK = (data) => {
-        // Logic to handle "OK" button press
-        navigation.replace('Home', { data });
-    };
-    const showAlert = (data) => {
-        Alert.alert(
-            'Registration Successful',
-            'Your have successfully registered yourself, Please press OK to continue',
-            [
-                {
-                    text: 'OK',
-                    onPress: () => { handleAlertOK(data) },
-                },
-            ],
-            { cancelable: false }
-        );
-    };
+  const [formData, setFormData] = useState({
+    driverName: "",
+    email: "",
+    vehicleType: selectedVehicle,
+    vehicleNo: "",
+    phone: route.params?.phone || "974771340",
+  });
 
+  const validateInputs = useCallback((inputValue, inputType) => {
+    const namePattern = /^[a-zA-Z\s]*$/;
+    if (inputType === "driverName" && !namePattern.test(inputValue)) return;
 
+    setFormData((prevData) => ({
+      ...prevData,
+      [inputType]: inputValue,
+    }));
+  }, []);
 
-    const registerUser = async () => {
-        setIsLoading(true);
-        console.log(registeredData);
-        try {
-            const data = await post(registeredData, 'registerDriver');
-            if (data) {
-                setIsLoading(false);
-                setDriverLocally(data.id);
-                setDriverDataLocally(data.id)
-                setGlobalData('driverId', data.id);
-            }
-        } catch (error) {
-            console.log(error);
-            setIsLoading(false);
-        }
+  const isDataValid = useCallback(() => {
+    return !Object.values(formData).some((value) => value.trim() === "");
+  }, [formData]);
+
+  const validateForm = () => {
+    const emailPattern = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+    if (!isDataValid()) {
+      setSnackBarText("Please fill all the data");
+      setVisible(true);
+    } else if (!emailPattern.test(formData.email)) {
+      setSnackBarText("Invalid Email");
+      setVisible(true);
+    } else {
+      registerUser();
     }
+  };
 
-    useEffect(() => {
-        setValid(isDataValid);
+  const registerUser = async () => {
+    setIsLoading(true);
+    try {
+      console.log(formData);
 
-    }, [registeredData]);
+      const response = await post(formData, "registerDriver");
+      if (response) {
+        console.log(response);
 
-
-    // Set local storage
-    const setDriverLocally = async (id) => {
-        try {
-            await AsyncStorage.setItem('isLoggedIn', 'true');
-            await AsyncStorage.setItem('driverId', id.toString());
-            console.log('Data saved successfully!');
-        } catch (error) {
-            console.log('Error saving data:', error);
-        }
+        await saveToLocalStorage(response.id);
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    const setDriverDataLocally = async (id) => {
-        const queryParameter = '?driverId=' + id.toString()
-        try {
-            const data = await get('getDriver', queryParameter);
-            if (data) {
-                await AsyncStorage.setItem('driverData', JSON.stringify(data));
-                setGlobalData('driverData', data);
-                showAlert(data)
-            }
-        } catch (error) {
-            console.log(error);
-        }
+  const saveToLocalStorage = async (id) => {
+    if (!id) {
+      console.error("Invalid driver ID");
+      return false;
     }
+    const queryParameter = `?driverId=${id}`;
+    try {
+      await AsyncStorage.setItem(DriverEnum.DRIVER_ID, id.toString());
+      const data = await get("getDriver", queryParameter);
 
-    const validateInputs = (text, type) => {
-
-        let nameRegex = /^[a-zA-Z\s]*$/;
-        if (type == 'driverName' && nameRegex.test(text)) {
-            setRegisterData({
-                ...registeredData,
-                [type]: text
-            });
-        } else if (type != 'driverName') {
-            setRegisterData({
-                ...registeredData,
-                [type]: text
-            });
-        }
-
-
+      if (data) {
+        setGlobalData(DriverEnum.DRIVER_DATA, data[0]);
+        showAlert();
+        console.log("Driver data saved in global context!");
+        return true;
+      } else {
+        console.warn("No driver data returned from API");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error handling driver data:", error);
+      return false;
     }
+  };
 
-    const isDataValid = () => {
-        let isValid = true;
-        for (let item in registeredData) {
-            if (registeredData[item] == '') {
-                isValid = false;
-            }
-        }
-        return isValid
-    }
+  const showAlert = (driverData) => {
+    Alert.alert(
+      "Registration Successful",
+      "You have successfully registered yourself. Please press OK to continue.",
+      [
+        {
+          text: "OK",
+          onPress: () => {
+            navigation.replace("Home", { driverData });
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
 
-    const validateForm = () => {
-        let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
-        if (!isDataValid()) {
-            setSnackBarText('Please fill all the data');
-            setVisible(true);
-        } else if (!emailRegex.test(registeredData.email)) {
-            setSnackBarText('Invalid Email');
-            setVisible(true);
-        } else {
-            registerUser();
-        }
+  const onDismissSnackBar = () => setVisible(false);
 
-    }
+  const handleBackPress = () => {
+    navigation.replace("Login");
+  };
 
-    const handleBackPress = () => {
-
-    }
-
-    const onDismissSnackBar = () => setVisible(false);
-
-    return (
-
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-            <View style={{ flex: 1 }}>
-                <Appbar.Header style={{ backgroundColor: Colors.bgLight }}>
-                    <Appbar.BackAction size={20} onPress={handleBackPress} />
-                    <Appbar.Content title="Back" titleStyle={{ fontSize: FontSize.medium }} />
-                </Appbar.Header>
-                <View style={[commonStyles.mainContainer, commonStyles.p16]}>
-                    <ScrollView automaticallyAdjustKeyboardInsets={true}>
-                        <View>
-                            {isLoading && <AppLoader />}
-                            <View>
-                                <Text style={[commonStyles.fnt24Medium, commonStyles.textPrimary, commonStyles.mb24]}>Sign up</Text>
-                                <View style={{ gap: 20 }}>
-                                    <AppTextInput
-                                        onChangeText={(text) => validateInputs(text, 'driverName')}
-                                        value={registeredData.driverName}
-                                        height={50}
-                                        placeholder="Full Name"
-                                    />
-                                    <AppTextInput
-                                        onChangeText={(text) => validateInputs(text, 'email')}
-                                        value={registeredData.email}
-                                        inputMode="email"
-                                        height={50}
-                                        placeholder="Email"
-                                    />
-                                    <View style={style.selectBox}>
-                                        <Picker
-                                            enabled={false}
-                                            selectedValue={selectedVehicle}
-                                            onValueChange={(itemValue) => setSelectedVehicle(itemValue)}
-                                        >
-                                            <Picker.Item label="Tata Ace" value="tataAce" />
-                                        </Picker>
-                                    </View>
-                                    <AppTextInput
-                                        onChangeText={(text) => validateInputs(text, 'vehicleNo')}
-                                        value={registeredData.vehicleNo}
-                                        height={50}
-                                        style={{ textTransform: 'uppercase' }}
-                                        placeholder="Vehicle Number"
-                                    />
-                                    <View style={[commonStyles.rowFlex]}>
-                                        <Checkbox
-                                            status={checked ? 'checked' : 'unchecked'}
-                                            color={Colors.bgPrimary}
-                                            onPress={() => {
-                                                setChecked(!checked);
-                                            }}
-                                        />
-                                        <Text style={[commonStyles.fnt12Regular, { marginTop: 6, flex: 1 }]}>By signing up. you agree to the Terms of service and Privacy policy.</Text>
-                                    </View>
-                                </View>
-
-                            </View>
-                            <Snackbar
-                                style={style.snackBar}
-                                visible={visible}
-                                duration={4000}
-                                onDismiss={onDismissSnackBar}
-                                action={{
-                                    label: 'OK',
-                                    labelStyle: { color: '#fff' },
-                                    onPress: () => {
-                                        // Do something
-                                    },
-                                }}
-                            >
-                                {snackBarText}
-                            </Snackbar>
-                        </View>
-                    </ScrollView>
-                    <TouchableOpacity disabled={!valid} style={valid ? commonStyles.btnPrimary : commonStyles.btnDisabled} onPress={validateForm}>
-                        <Text style={[commonStyles.fnt16Medium, commonStyles.textCenter, commonStyles.textWhite]}>Register</Text>
-                    </TouchableOpacity>
+  return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={{ flex: 1 }}>
+        <Appbar.Header style={{ backgroundColor: theme.bgLight }}>
+          <Appbar.BackAction
+            size={20}
+            color={theme.bgDark}
+            onPress={handleBackPress}
+          />
+          <Appbar.Content
+            title="Back"
+            titleStyle={[
+              commonStyles.fnt16Medium,
+              { color: theme.textPrimary },
+            ]}
+          />
+        </Appbar.Header>
+        <View
+          style={[
+            commonStyles.flex1,
+            commonStyles.p16,
+            { backgroundColor: theme.bgLight },
+          ]}
+        >
+          <ScrollView automaticallyAdjustKeyboardInsets={true}>
+            <View>
+              {isLoading && <AppLoader />}
+              <View>
+                <Text
+                  style={[
+                    commonStyles.fnt24Medium,
+                    commonStyles.textPrimary,
+                    commonStyles.mb24,
+                    { color: theme.bgDark },
+                  ]}
+                >
+                  Sign up
+                </Text>
+                <View style={{ gap: 20 }}>
+                  <AppTextInput
+                    onChangeText={(text) => validateInputs(text, "driverName")}
+                    value={formData.driverName}
+                    height={50}
+                    placeholder="Full Name"
+                  />
+                  <AppTextInput
+                    onChangeText={(text) => validateInputs(text, "email")}
+                    value={formData.email}
+                    inputMode="email"
+                    height={50}
+                    placeholder="Email"
+                  />
+                  <View
+                    style={[style.selectBox, { backgroundColor: theme.bgInfo }]}
+                  >
+                    <Picker
+                      enabled={false}
+                      selectedValue={selectedVehicle}
+                      style={{ color: theme.bgDark }}
+                      dropdownIconColor={theme.bgDark}
+                      onValueChange={(itemValue) =>
+                        setSelectedVehicle(itemValue)
+                      }
+                    >
+                      <Picker.Item label="Tata Ace" value="tataAce" />
+                    </Picker>
+                  </View>
+                  <AppTextInput
+                    onChangeText={(text) => validateInputs(text, "vehicleNo")}
+                    value={formData.vehicleNo}
+                    height={50}
+                    style={{ textTransform: "uppercase" }}
+                    placeholder="Vehicle Number"
+                  />
+                  <View style={[commonStyles.rowFlex, commonStyles.alignTop]}>
+                    <Checkbox
+                      status={checked ? "checked" : "unchecked"}
+                      color={Colors.bgPrimary}
+                      uncheckedColor={theme.bgDark}
+                      onPress={() => {
+                        setChecked(!checked);
+                      }}
+                    />
+                    <Text
+                      style={[
+                        commonStyles.fnt12Regular,
+                        commonStyles.flex1,
+                        commonStyles.mt5,
+                        { color: theme.bgDark },
+                      ]}
+                    >
+                      By signing up. you agree to the Terms of service and
+                      Privacy policy.
+                    </Text>
+                  </View>
                 </View>
+              </View>
             </View>
-        </TouchableWithoutFeedback>
-
-
-    )
-}
+          </ScrollView>
+          <TouchableOpacity
+            style={commonStyles.btnPrimary}
+            onPress={validateForm}
+          >
+            <Text
+              style={[
+                commonStyles.fnt16Medium,
+                commonStyles.textCenter,
+                commonStyles.textWhite,
+              ]}
+            >
+              Register
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <Snackbar
+          style={style.snackBar}
+          visible={visible}
+          duration={4000}
+          onDismiss={onDismissSnackBar}
+          action={{
+            label: "OK",
+            labelStyle: { color: "#fff" },
+            onPress: () => {
+              // Do something
+            },
+          }}
+        >
+          {snackBarText}
+        </Snackbar>
+      </View>
+    </TouchableWithoutFeedback>
+  );
+};
 
 export default Register;

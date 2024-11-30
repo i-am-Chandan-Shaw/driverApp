@@ -1,70 +1,95 @@
-import React, { useEffect } from 'react';
-import { View, Image } from 'react-native';
-import { locationPermission } from '../../core/helper/helper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import commonStyles from '../../constants/commonStyle';
-import { useTheme } from "../../constants/ThemeContext";
+import React, { useContext, useEffect } from "react";
+import { View, Image } from "react-native";
+import { locationPermission } from "../../core/helper/helper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import commonStyles from "../../constants/commonStyle";
+import { DriverEnum } from "../../constants/enums";
+import { get } from "../../core/helper/services";
+import { AppContext } from "../../core/helper/AppContext";
+import { useNavigation } from "@react-navigation/native";
 
+const SplashScreen = () => {
+  const { setGlobalData } = useContext(AppContext);
+  const navigation = useNavigation();
 
-const SplashScreen=({navigation})=>{
-    const { theme } = useTheme()
+  useEffect(() => {
+    const timeout = setTimeout(async () => {
+      await initializeApp();
+    }, 1000);
 
-    useEffect(()=>{
-        const timeout = setTimeout(() => {
-            getLiveLocation();
-            checkAuthentication()
-        }, 1000);
-    },[])
+    return () => clearTimeout(timeout); // Cleanup timeout
+  }, []);
 
-    const checkAuthentication = async () => {
-        try {
-            const value = await AsyncStorage.getItem('isLoggedIn');
-            if (value !== null) {
-                if(value=='true'){
-                    navigation.replace('Home')
-                }
-                else{
-                    navigation.replace('Login')
-                    return false
-                }
-            } else {
-                navigation.replace('Login')
-                console.log('Data not found!');
-                return false
-            }
-        } catch (error) {
-            console.log('Error retrieving data:', error);
-            return false
-        }
+  const initializeApp = async () => {
+    try {
+      await Promise.all([checkUserAuthentication(), getLiveLocation()]);
+    } catch (error) {
+      console.error("Error during app initialization:", error);
+    }
+  };
+
+  const checkUserAuthentication = async () => {
+    try {
+      const driverId = await AsyncStorage.getItem(DriverEnum.DRIVER_ID);
+      if (driverId) {
+        await initializeGlobalData(driverId);
+      } else {
+        console.warn("Driver ID not found, redirecting to login.");
+        navigation.replace("Login");
+      }
+    } catch (error) {
+      console.error("Error retrieving driver ID from storage:", error);
+      navigation.replace("Login");
+    }
+  };
+
+  const initializeGlobalData = async (driverId) => {
+    if (!driverId) {
+      console.error("Invalid driver ID");
+      return;
     }
 
-    // Getting Location Access
+    try {
+      const queryParameter = `?driverId=${driverId}`;
+      const driverData = await get("getDriver", queryParameter);
 
-    const getLiveLocation = async () => {
-        try{
-            const status = await locationPermission()
-            if (status) {
-                console.log('Permission Granted');
-            }
-        }catch(error){
-            console.log(error);
-            
-        }
-       
+      if (driverData) {
+        setGlobalData(DriverEnum.DRIVER_DATA, driverData[0]);
+        console.log("Driver data saved in global context!");
+        navigation.replace("Home");
+      } else {
+        console.warn("No driver data returned from API, redirecting to login.");
+        navigation.replace("Login");
+      }
+    } catch (error) {
+      console.error("Error fetching driver data from API:", error);
+      navigation.replace("Login");
     }
+  };
 
-    
+  // Request live location access
+  const getLiveLocation = async () => {
+    try {
+      const status = await locationPermission();
+      if (status) {
+        console.log("Location permission granted.");
+      } else {
+        console.warn("Location permission denied.");
+      }
+    } catch (error) {
+      console.error("Error requesting location permission:", error);
+    }
+  };
 
-return (
+  return (
     <View style={[commonStyles.flexCenter]}>
-       <Image 
-    style={{ width: '40%', height: undefined, aspectRatio: 470 / 347 }} 
-    source={require('../../assets/images/logo.png')} 
-    resizeMode="contain" 
-/>
-
+      <Image
+        style={{ width: "40%", height: undefined, aspectRatio: 470 / 347 }}
+        source={require("../../assets/images/logo.png")}
+        resizeMode="contain"
+      />
     </View>
-    )
-}
+  );
+};
 
 export default SplashScreen;
