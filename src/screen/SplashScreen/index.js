@@ -15,20 +15,20 @@ const SplashScreen = () => {
   useEffect(() => {
     const timeout = setTimeout(async () => {
       await initializeApp();
-    }, 1000);
+    }, 200);
 
     return () => clearTimeout(timeout); // Cleanup timeout
   }, []);
 
   const initializeApp = async () => {
     try {
-      await Promise.all([checkUserAuthentication(), getLiveLocation()]);
+      await Promise.all([checkDriverAuthentication(), getLiveLocation()]);
     } catch (error) {
       console.error("Error during app initialization:", error);
     }
   };
 
-  const checkUserAuthentication = async () => {
+  const checkDriverAuthentication = async () => {
     try {
       const driverId = await AsyncStorage.getItem(DriverEnum.DRIVER_ID);
       if (driverId) {

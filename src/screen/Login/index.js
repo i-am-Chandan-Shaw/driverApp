@@ -193,7 +193,7 @@ const Login = () => {
     try {
       const driverData = await get("getDriver", queryParameter);
       if (driverData) {
-        setGlobalData(DriverEnum.Driver_DATA, driverData[0]);
+        setGlobalData(DriverEnum.DRIVER_DATA, driverData[0]);
         navigation.replace("Home");
         console.log("Driver data fetched and set globally");
       } else {

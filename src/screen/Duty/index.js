@@ -29,7 +29,6 @@ import AppLoader from "../../core/component/AppLoader";
 import { AppContext } from "../../core/helper/AppContext";
 import messaging from "@react-native-firebase/messaging";
 import { Snackbar } from "react-native-paper";
-import WebViewBanner from "../../core/component/Promotion-Banner/WebViewBanner";
 import { useTheme } from "../../constants/ThemeContext";
 import useFontStyles from "../../constants/fontStyle";
 
@@ -69,7 +68,7 @@ const Duty = () => {
 
   useEffect(() => {
     const handleAppStateChange = (nextAppState) => {
-      if (globalData?.driverData?.[0]?.id && updateDriver) {
+      if (globalData.driverData.id && updateDriver) {
         const activeState = nextAppState === "active" ? 1 : 0;
         const payload = {
           id: globalData.driverData.id,
@@ -101,10 +100,14 @@ const Duty = () => {
     getTripId();
   };
 
+  
+
   const getDeviceToken = async () => {
     try {
       const token = await messaging().getToken();
       if (token) {
+        console.log(token);
+
         const payload = {
           id: globalData?.driverData.id,
           pushToken: token,
@@ -236,7 +239,7 @@ const Duty = () => {
 
   const getActiveRides = async () => {
     let driverCoords = {
-      id: globalData?.driverId,
+      id: globalData?.id,
       driverCoordinates: {
         lat: currentLocation?.latitude,
         lng: currentLocation?.longitude,
@@ -413,7 +416,7 @@ const Duty = () => {
               style={style.mapContainer}
               initialRegion={currentLocation}
               toolbarEnabled={false}
-              loadingEnabled={true}
+              loadingEnabled={false}
               showsUserLocation={true}
               showsMyLocationButton={false}
               onMapLoaded={() => {}}

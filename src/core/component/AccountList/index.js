@@ -24,18 +24,9 @@ const AccountList = ({ driverData }) => {
   }, [driverData]);
 
   const logout = async () => {
-    console.log(driverData);
-
-    const payload = {
-      id: globalData?.driverData[0].id,
-      active: 0,
-    };
     try {
       await AsyncStorage.removeItem(DriverEnum.DRIVER_ID);
-      const data = await patch(payload, "patchDriver");
-      if (data) {
-        navigation.replace("Login");
-      }
+      navigation.replace("Login");
     } catch (error) {
       console.error("Error logging out:", error);
     }
