@@ -10,7 +10,7 @@ import TripDetails from "../screen/TripDetails";
 import RideHistory from "../screen/RideHistory";
 import Wallet from "../screen/Wallet";
 import EarningHistory from "../screen/EarningHistory";
-import Verification from "../screen/Verification";
+import VerificationPage from "../screen/Verification";
 import Register from "../screen/Register";
 import BankDetails from "../screen/BankDetails";
 import LiveTracking from "../screen/LiveTracking";
@@ -54,7 +54,7 @@ const Navigation = () => {
         <Stack.Screen
           name="Verification"
           options={{ headerShown: true, title: "Verification" }}
-          component={Verification}
+          component={VerificationPage}
         />
         <Stack.Screen
           name="EarningHistory"

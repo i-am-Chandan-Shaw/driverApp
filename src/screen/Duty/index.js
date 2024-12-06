@@ -384,7 +384,7 @@ const Duty = () => {
                 { backgroundColor: theme.bgLight },
               ]}
             >
-              <Image style={style.image} source={imagePath.van} />
+              <Image style={style.image} source={imagePath.duty} />
               <Text style={[fontStyles.fnt16Medium]}>
                 Go ON DUTY to start earning !{" "}
               </Text>
