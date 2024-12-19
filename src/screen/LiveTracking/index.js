@@ -5,18 +5,12 @@ import React, {
   useContext,
   useCallback,
 } from "react";
-import {
-  View,
-  Dimensions,
-  Platform,
-  Alert,
-} from "react-native";
+import { View, Dimensions, Platform, Alert } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
-  TouchableOpacity,
 } from "@gorhom/bottom-sheet";
 import MapViewDirections from "react-native-maps-directions";
 import { REACT_APP_MAPS_API } from "@env";
@@ -65,7 +59,7 @@ const LiveTracking = (props) => {
     if (!tripData) {
       return null;
     }
-    tripStarted = tripData.status == 4;
+    const tripStarted = tripData.status == 4;
 
     console.log(locationDetails.hasTripStarted);
 
