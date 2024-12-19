@@ -41,7 +41,7 @@ const style = StyleSheet.create({
     timeLine: {
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
     },
     locationContainer: {
         flexDirection: 'row',

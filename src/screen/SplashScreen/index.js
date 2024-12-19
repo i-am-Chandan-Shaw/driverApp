@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { View, Image } from "react-native";
-import { locationPermission } from "../../core/helper/helper";
+import { handleLocationPermission } from "../../core/helper/locationHelper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import commonStyles from "../../constants/commonStyle";
 import { DriverEnum } from "../../constants/enums";
@@ -15,14 +15,17 @@ const SplashScreen = () => {
   useEffect(() => {
     const timeout = setTimeout(async () => {
       await initializeApp();
-    }, 200);
+    });
 
     return () => clearTimeout(timeout); // Cleanup timeout
   }, []);
 
   const initializeApp = async () => {
     try {
-      await Promise.all([checkDriverAuthentication(), getLiveLocation()]);
+      await Promise.all([
+        checkDriverAuthentication(),
+        handleLocationPermission(),
+      ]);
     } catch (error) {
       console.error("Error during app initialization:", error);
     }
@@ -32,7 +35,7 @@ const SplashScreen = () => {
     try {
       const driverId = await AsyncStorage.getItem(DriverEnum.DRIVER_ID);
       if (driverId) {
-        await initializeGlobalData(driverId);
+        await initializeGLobalData(driverId);
       } else {
         console.warn("Driver ID not found, redirecting to login.");
         navigation.replace("Login");
@@ -43,7 +46,7 @@ const SplashScreen = () => {
     }
   };
 
-  const initializeGlobalData = async (driverId) => {
+  const initializeGLobalData = async (driverId) => {
     if (!driverId) {
       console.error("Invalid driver ID");
       return;
@@ -64,20 +67,6 @@ const SplashScreen = () => {
     } catch (error) {
       console.error("Error fetching driver data from API:", error);
       navigation.replace("Login");
-    }
-  };
-
-  // Request live location access
-  const getLiveLocation = async () => {
-    try {
-      const status = await locationPermission();
-      if (status) {
-        console.log("Location permission granted.");
-      } else {
-        console.warn("Location permission denied.");
-      }
-    } catch (error) {
-      console.error("Error requesting location permission:", error);
     }
   };
 

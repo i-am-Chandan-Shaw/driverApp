@@ -1,74 +1,112 @@
-import { StyleSheet,Dimensions } from 'react-native'
-const { width, height } = Dimensions.get('window');
+import { StyleSheet, Dimensions } from "react-native";
+import { lightTheme } from "../../../constants/color";
+const { width, height } = Dimensions.get("window");
 
 const style = StyleSheet.create({
-    bottomContainer:{
-        width:'100%',
-        flexDirection:'column',
-        justifyContent:'center',
-        alignItems:'center',
-    },
-     numberPlateContainer:{
-        borderColor:'#ddd',
-        borderWidth:1,
-        alignSelf:'flex-start',
-        padding:7,
-        borderRadius:5,
-        marginTop:10
-     },
-     alignCenter:{
-        flexDirection:'row',
-        alignItems:'center'
-     },
-     topContainer:{
-        padding:10,
-        paddingVertical:15,
-        flexDirection:'row',
-        justifyContent:'space-between',
-        alignItems:'center',
-        backgroundColor:'#fff',
-        marginBottom:10
-     },
-     phoneContainer:{
-        alignSelf:'flex-start',
-        padding:8,
-        elevation:3,
-        backgroundColor:'#77dd77',
-        borderRadius:8
-     },
-     text: {
-      fontSize: 18,
-      marginBottom: 20,
-    },
-    slider: {
-      width: width * 0.75,
-      height: 60,
-      backgroundColor: '#4773fa',
-      borderRadius: 30,
-      overflow: 'hidden',
-    },
-    track: {
-      height: 40,
-      backgroundColor: '#4773fa', // Fill color of the track
-    },
-    thumb: {
-      position: 'absolute',
-      width: 55,
-      height: 55,
-      borderRadius: 30,
-      backgroundColor: '#fff',
-      top:2.5,
-      marginLeft:2,
-      justifyContent:'center',
-      alignItems:'center'
-    },
-    sliderText:{
-      position:'absolute', 
-      left:50,
-      top:17,
-      fontSize:16,
-      color:'#fff'
-    }
+  topContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderColor: "#DDD",
+  },
+  userDetailsContainer: {
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "center",
+  },
+  durationContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    gap: 4,
+    borderBottomWidth: 1,
+    borderColor: "#DDD",
+  },
+  imageContainer: {
+    width: 55,
+    height: 55,
+    borderWidth: 1,
+    borderRadius: 5,
+    borderColor: "#ddd",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  userMetaDataContainer: {
+    width: width - 180,
+  },
+  vehicleImage: {
+    height: 55,
+    width: 55,
+  },
+  paymentContainer: {
+    padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  actionContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+    paddingTop: 0,
+    gap: 8,
+  },
+
+  circularContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: lightTheme.bgPrimary,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  addressContainer: {
+    marginTop: 10,
+    paddingHorizontal: 16,
+  },
+  timeLine: {
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: 'flex-start',
+  },
+  locationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    marginTop: 8,
+  },
+  locationText: {
+    paddingHorizontal: 10,
+  },
+  text: {
+    color: "#000000",
+    fontSize: 12,
+  },
+  circle: {
+    width: 8,
+    height: 8,
+    backgroundColor: "#D21F3C",
+    borderRadius: 4,
+  },
+  dottedLine: {
+    width: 1,
+    flex:1,
+    borderLeftColor: "#778899",
+    borderLeftWidth: 2,
+    borderStyle: "dotted",
+  },
+  tripStatusBtn: {
+    width: width - 160,
+  },
 });
 
 export default style;

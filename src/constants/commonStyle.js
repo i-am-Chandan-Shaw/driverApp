@@ -1,34 +1,57 @@
 // commonStyles.js
 import { StyleSheet } from "react-native";
-import Colors from "./Colors";
 import FontSize from "./FontSize";
+import { lightTheme } from "./color";
 
 const commonStyles = StyleSheet.create({
   // Button Css Starts
   btnPrimary: {
     padding: 15,
-    backgroundColor: Colors.bgPrimary,
+    backgroundColor: lightTheme.bgPrimary,
     borderRadius: 8,
     width: "100%",
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  btnDanger: {
+    padding: 15,
+    backgroundColor: lightTheme.danger,
+    borderRadius: 8,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  btnSuccess: {
+    padding: 15,
+    backgroundColor: lightTheme.success,
+    borderRadius: 8,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   btnOutline: {
     padding: 15,
     borderRadius: 8,
-    backgroundColor: Colors.bgLight,
-    borderColor: Colors.bgPrimary,
+    backgroundColor: lightTheme.bgLight,
+    borderColor: lightTheme.bgPrimary,
     width: "100%",
+  },
+  btnSmall: {
+    padding: 8,
   },
 
   btnDisabled: {
     padding: 15,
-    backgroundColor: Colors.bgPrimary,
+    backgroundColor: lightTheme.bgPrimary,
     borderRadius: 8,
     opacity: 0.5,
     width: "100%",
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
   },
   // Button Css Ends
 
@@ -41,11 +64,21 @@ const commonStyles = StyleSheet.create({
 
   // Fonts starts
 
+  fnt12Medium: {
+    fontSize: FontSize.xSmall,
+    fontFamily: "Poppins-SemiBold",
+    color: "#000",
+  },
   fnt12Regular: {
     fontSize: FontSize.xSmall,
     fontFamily: "Poppins",
     color: "#000",
-    lineHeight: 18,
+  },
+
+  fnt10Regular: {
+    fontSize: FontSize.xxSmall,
+    fontFamily: "Poppins",
+    lineHeight: 16,
   },
 
   fnt16Regular: {
@@ -86,22 +119,22 @@ const commonStyles = StyleSheet.create({
     textAlign: "center",
   },
   textWhite: {
-    color: Colors.bgLight,
+    color: lightTheme.bgLight,
   },
   textPrimary: {
-    color: Colors.textPrimary,
+    color: lightTheme.textPrimary,
   },
   textSecondary: {
-    color: Colors.textSecondary,
+    color: lightTheme.textSecondary,
   },
   textTertiary: {
-    color: Colors.textTertiary,
+    color: lightTheme.textTertiary,
   },
   textDisabled: {
-    color: Colors.textDisabled,
+    color: lightTheme.textDisabled,
   },
   textInfo: {
-    color: Colors.textInfo,
+    color: lightTheme.textInfo,
   },
 
   // Spacing and Margin starts
@@ -177,10 +210,20 @@ const commonStyles = StyleSheet.create({
     justifyContent: "center",
     flex: 1,
   },
+  gap1: {
+    gap: 4,
+  },
+  gap2: {
+    gap: 8,
+  },
   rowFlex: {
     flexDirection: "row",
   },
   rowCenter: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  rowSpaceBetween: {
     flexDirection: "row",
     alignItems: "center",
   },
@@ -189,7 +232,7 @@ const commonStyles = StyleSheet.create({
   },
 
   mainContainer: {
-    backgroundColor: Colors.bgLight,
+    backgroundColor: lightTheme.bgLight,
     flex: 1,
   },
 });
