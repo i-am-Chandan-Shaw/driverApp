@@ -1,13 +1,15 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { get } from "./services";
+import { patch } from "./services";
 
-export const getCurrentTripData = async (tripId) => {
-  const queryParameter = `?tripId=${tripId}`;
+export const updateDriverPushToken = async (driverId, pushToken) => {
+  const payload = {
+    id: driverId,
+    pushToken,
+  };
   try {
-    const tripData = await get("getRequestVehicle", queryParameter);
-    return tripData;
+    const response = await patch(payload, "patchDriver");
+    return response;
   } catch (fetchError) {
-    console.error("Error fetching current trip details:", fetchError);
+    console.error("Error patching access token:", fetchError);
     return null;
   }
 };

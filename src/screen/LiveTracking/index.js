@@ -37,7 +37,8 @@ const initialRegion = getInitialRegionForMap();
 
 const LiveTracking = (props) => {
   const { theme } = useTheme();
-
+  const navigation = useNavigation();
+  
   const mapRef = useRef();
   const markerRef = useRef();
   const bottomSheetRef = useRef();
@@ -53,7 +54,7 @@ const LiveTracking = (props) => {
     distanceLeft: null,
     hasTripStarted: false,
   });
-  const navigation = useNavigation();
+
 
   const initializeMapDirectionPoints = (tripData) => {
     if (!tripData) {

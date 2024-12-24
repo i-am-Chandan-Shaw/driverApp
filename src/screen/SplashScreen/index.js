@@ -57,6 +57,8 @@ const SplashScreen = () => {
       const driverData = await get("getDriver", queryParameter);
 
       if (driverData) {
+        
+        
         setGlobalData(DriverEnum.DRIVER_DATA, driverData[0]);
         console.log("Driver data saved in global context!");
         navigation.replace("Home");

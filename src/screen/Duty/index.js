@@ -28,8 +28,11 @@ import { useTheme } from "../../constants/ThemeContext";
 import imagePath from "../../constants/imagePath";
 import commonStyles from "../../constants/commonStyle";
 import MapView, { Circle, Marker } from "react-native-maps";
+import messaging from "@react-native-firebase/messaging";
+
 import CustomMarker from "../../core/component/CustomMarker";
 import TripCard from "../../core/component/TripCard";
+import { updateDriverPushToken } from "../../core/helper/apiHelper";
 
 const { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -56,9 +59,31 @@ const Duty = () => {
   // -------------------------- Location Access Logic ------------------------------ //
 
   useEffect(() => {
+    if (globalData.driverData) {
+      console.log(globalData.driverData);
+      getDeviceToken();
+    }
     fetchUserLocation();
     getTripStatus();
   }, []);
+
+  const getDeviceToken = async () => {
+    try {
+      const token = await messaging().getToken();
+      if (token) {
+        console.log(token);
+        let response = await updateDriverPushToken(
+          globalData.driverData.id,
+          token
+        );
+        if (response) {
+          console.log(response);
+        }
+      }
+    } catch (error) {
+      console.log("Error fetching device token:", error);
+    }
+  };
 
   const getTripStatus = async () => {
     if (!globalData.driverData) {
@@ -307,7 +332,7 @@ const Duty = () => {
               ]}
             >
               <Image style={style.image} source={imagePath.duty} />
-              <Text style={[commonStyles.fnt16Medium]}>
+              <Text style={[commonStyles.fnt16Medium, { color: theme.bgDark }]}>
                 {hasActiveTrip
                   ? "You have an active trip !"
                   : "Go ON DUTY to start earning !"}

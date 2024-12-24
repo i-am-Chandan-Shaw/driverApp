@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "983968654703",
     "project_id": "loadgopartner",
-    "storage_bucket": "loadgopartner.appspot.com"
+    "storage_bucket": "loadgopartner.firebasestorage.app"
   },
   "client": [
     {
@@ -13,6 +13,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "983968654703-2eolvlnm8hup9klh9spmbplcs65ffutn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.loadgopartner",
+            "certificate_hash": "e0b43ed80ccdf16aa199590ed6de40a4144d7b0e"
+          }
+        },
         {
           "client_id": "983968654703-il24feee90tdtc72mg1vk91episc60hq.apps.googleusercontent.com",
           "client_type": 1,
