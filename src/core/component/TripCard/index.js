@@ -10,6 +10,7 @@ import { useTheme } from "../../../constants/ThemeContext";
 import commonStyles from "../../../constants/commonStyle";
 import AppLoader from "../AppLoader";
 import { DriverEnum } from "../../../constants/enums";
+import { convertMinToHours } from "../../helper/commonHelper";
 
 const TripCard = ({ cardData, sendData }) => {
   const { theme } = useTheme();
@@ -119,7 +120,8 @@ const TripCard = ({ cardData, sendData }) => {
               <View style={style.infoContainer}>
                 <MatIcon name="location-pin" size={12} color="#333" />
                 <Text style={[commonStyles.fnt12Regular]}>
-                  {currentTripData?.distance} Km
+                  {currentTripData?.distance} Km (
+                  {convertMinToHours(currentTripData?.totalTime)})
                 </Text>
               </View>
               <View style={style.infoContainer}>

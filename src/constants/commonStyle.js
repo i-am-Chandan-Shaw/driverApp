@@ -230,7 +230,9 @@ const commonStyles = StyleSheet.create({
   columnCenter: {
     alignItems: "center",
   },
-
+  justifyBetween: {
+    justifyContent: "space-between",
+  },
   mainContainer: {
     backgroundColor: lightTheme.bgLight,
     flex: 1,

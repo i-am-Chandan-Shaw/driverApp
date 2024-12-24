@@ -307,7 +307,7 @@ const Duty = () => {
               ]}
             >
               <Image style={style.image} source={imagePath.duty} />
-              <Text style={[commonStyles.fnt16Medium]}>
+              <Text style={[commonStyles.fnt16Medium, { color: theme.bgDark }]}>
                 {hasActiveTrip
                   ? "You have an active trip !"
                   : "Go ON DUTY to start earning !"}

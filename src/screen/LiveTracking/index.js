@@ -5,7 +5,14 @@ import React, {
   useContext,
   useCallback,
 } from "react";
-import { View, Dimensions, Platform, Alert } from "react-native";
+import {
+  View,
+  Dimensions,
+  Platform,
+  Alert,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
 import {
@@ -41,17 +48,19 @@ const LiveTracking = (props) => {
   const mapRef = useRef();
   const markerRef = useRef();
   const bottomSheetRef = useRef();
+  const { globalData } = useContext(AppContext);
 
   const [currentTrip, setCurrentTrip] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const snapPoints = [300, height - 310];
-  const { globalData } = useContext(AppContext);
+  const snapPoints = [320, height - 200];
+  const [mapDirectionResult, setMapDirectionResult] = useState(null);
   const [locationDetails, setLocationDetails] = useState({
     currentLocation: null,
     dropLocation: null,
     travelDuration: null,
     distanceLeft: null,
     hasTripStarted: false,
+    locationType: "pickup location",
   });
   const navigation = useNavigation();
 
@@ -71,6 +80,10 @@ const LiveTracking = (props) => {
       ? parseFloat(tripData.dropCoords.dropLng)
       : parseFloat(tripData.pickUpCoords.pickUpLng);
 
+    const updatedLocationType = tripStarted
+      ? "drop location"
+      : "pickup location";
+
     const endLocation = {
       latitude: endLat,
       longitude: endLng,
@@ -79,6 +92,7 @@ const LiveTracking = (props) => {
     setLocationDetails((prevState) => ({
       ...prevState,
       dropLocation: endLocation,
+      locationType: updatedLocationType,
     }));
   };
 
@@ -160,6 +174,7 @@ const LiveTracking = (props) => {
 
   // -------------------------- Initialization Logic ------------------------------ //
   useEffect(() => {
+    setIsLoading(true);
     onInitialLoad();
     const updateInterval = setInterval(() => {
       fetchCurrentLocationAndUpdate();
@@ -176,7 +191,6 @@ const LiveTracking = (props) => {
       getTripStatus();
     }
     initializeMapDirectionPoints(currentTrip);
-    bottomSheetRef.current?.present();
   };
 
   const animateMarkerMovement = (latitude, longitude) => {
@@ -190,11 +204,47 @@ const LiveTracking = (props) => {
     }
   };
 
+  const onMapReady = (mapData) => {
+    mapRef.current.fitToCoordinates(mapData.coordinates, {
+      edgePadding: { top: 50, right: 50, bottom: 300, left: 50 },
+      animated: true,
+    });
+
+    const durationLeft = convertMinToHours(mapData.duration);
+    const distanceLeft = mapData.distance;
+    setMapDirectionResult(mapData);
+
+    setLocationDetails((prevState) => ({
+      ...prevState,
+      travelDuration: durationLeft,
+      distanceLeft,
+    }));
+    bottomSheetRef.current?.present();
+    setIsLoading(false);
+  };
+
+  const onCenter = () => {
+    if (mapDirectionResult) {
+      mapRef.current.fitToCoordinates(mapDirectionResult.coordinates, {
+        edgePadding: { top: 50, right: 50, bottom: 300, left: 50 },
+        animated: true,
+      });
+    } else {
+      mapRef.current.animateToRegion(locationState.currentLocation);
+    }
+  };
+
   return (
     <GestureHandlerRootView>
       <BottomSheetModalProvider>
         {isLoading && <AppLoader />}
 
+        <TouchableOpacity
+          style={style.showLocationContainer}
+          onPress={onCenter}
+        >
+          <Image source={imagePath.liveLocationBtn} />
+        </TouchableOpacity>
         <MapView
           ref={mapRef}
           style={style.mapContainer}
@@ -203,7 +253,7 @@ const LiveTracking = (props) => {
           loadingEnabled={false}
           showsUserLocation={true}
           mapType={"standard"}
-          showsMyLocationButton={true}
+          showsMyLocationButton={false}
         >
           {locationDetails.currentLocation && (
             <>
@@ -235,20 +285,11 @@ const LiveTracking = (props) => {
               strokeWidth={3}
               strokeColor={theme.bgPrimary}
               optimizeWaypoints={true}
+              onStart={(result) => {
+                setIsLoading(true);
+              }}
               onReady={(result) => {
-                mapRef.current.fitToCoordinates(result.coordinates, {
-                  edgePadding: { top: 50, right: 50, bottom: 300, left: 50 },
-                  animated: true,
-                });
-
-                const durationLeft = convertMinToHours(result.duration);
-                const distanceLeft = result.distance;
-
-                setLocationDetails((prevState) => ({
-                  ...prevState,
-                  travelDuration: durationLeft,
-                  distanceLeft,
-                }));
+                onMapReady(result);
               }}
             />
           )}
