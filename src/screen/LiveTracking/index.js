@@ -285,9 +285,6 @@ const LiveTracking = (props) => {
               strokeWidth={3}
               strokeColor={theme.bgPrimary}
               optimizeWaypoints={true}
-              onStart={(result) => {
-                setIsLoading(true);
-              }}
               onReady={(result) => {
                 onMapReady(result);
               }}

@@ -102,8 +102,8 @@ android {
         applicationId "com.loadgopartner"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 15
-        versionName "1.0000015"
+        versionCode 16
+        versionName "1.0000016"
     }
 
     splits {
