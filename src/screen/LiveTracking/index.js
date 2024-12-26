@@ -50,8 +50,8 @@ const LiveTracking = (props) => {
   const bottomSheetRef = useRef();
   const { globalData } = useContext(AppContext);
 
+  const [isLoading, setIsLoading] = useState(true);
   const [currentTrip, setCurrentTrip] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
   const snapPoints = [320, height - 200];
   const [mapDirectionResult, setMapDirectionResult] = useState(null);
   const [locationDetails, setLocationDetails] = useState({
@@ -69,8 +69,6 @@ const LiveTracking = (props) => {
       return null;
     }
     const tripStarted = tripData.status == 4;
-
-    console.log(locationDetails.hasTripStarted);
 
     const endLat = tripStarted
       ? parseFloat(tripData.dropCoords.dropLat)
@@ -106,31 +104,28 @@ const LiveTracking = (props) => {
       const { coordinates } = locationData;
 
       if (globalData.driverData) {
-        await updateTripLocationDetails(coordinates);
+        await updateDriverCurrentLocation(coordinates);
       }
-      setLocationDetails((prevState) => {
-        // animateMarkerMovement(coordinates.latitude, coordinates.longitude);
-        return {
-          ...prevState,
-          currentLocation: coordinates,
-        };
-      });
+      setLocationDetails((prevState) => ({
+        ...prevState,
+        currentLocation: coordinates,
+      }));
     } catch (error) {
       console.error("Error fetching location:", error);
     }
-  }, []);
+  }, [globalData.driverData, currentTrip]); // Include dependencies.
 
-  const updateTripLocationDetails = async (coordinates) => {
+  const updateDriverCurrentLocation = async (coordinates) => {
     if (!currentTrip) {
       return null;
     }
     const payload = {
-      id: currentTrip?.tripId,
-      driverLat: coordinates.latitude.toString(),
-      driverLng: coordinates.longitude.toString(),
+      id: globalData.driverData?.id,
+      lat: coordinates.latitude.toString(),
+      lng: coordinates.longitude.toString(),
     };
 
-    const endPoint = "patchRequestVehicle";
+    const endPoint = "patchDriver";
     try {
       const data = await patch(payload, endPoint);
       if (data) {
@@ -173,9 +168,11 @@ const LiveTracking = (props) => {
   }, [currentTrip?.tripId, navigation]);
 
   // -------------------------- Initialization Logic ------------------------------ //
+
   useEffect(() => {
-    setIsLoading(true);
     onInitialLoad();
+
+    // Set up interval for subsequent API calls.
     const updateInterval = setInterval(() => {
       fetchCurrentLocationAndUpdate();
       getTripStatus();
@@ -184,23 +181,16 @@ const LiveTracking = (props) => {
     return () => clearInterval(updateInterval);
   }, [fetchCurrentLocationAndUpdate, getTripStatus]);
 
-  const onInitialLoad = () => {
-    if (props?.route.params.tripData) {
-      setCurrentTrip(props.route.params.tripData);
-    } else {
-      getTripStatus();
-    }
-    initializeMapDirectionPoints(currentTrip);
-  };
-
-  const animateMarkerMovement = (latitude, longitude) => {
-    const newCoordinate = { latitude, longitude };
-    if (Platform.OS == "android") {
-      if (markerRef.current) {
-        markerRef.current.animateMarkerToCoordinate(newCoordinate, 8000);
+  const onInitialLoad = async () => {
+    try {
+      if (props?.route.params.tripData) {
+        setCurrentTrip(props.route.params.tripData);
+      } else {
+        await getTripStatus();
       }
-    } else {
-      state.coordinate.timing(newCoordinate).start();
+      initializeMapDirectionPoints(currentTrip);
+    } catch (error) {
+      console.error("Error during initial load:", error);
     }
   };
 
@@ -219,7 +209,9 @@ const LiveTracking = (props) => {
       travelDuration: durationLeft,
       distanceLeft,
     }));
+
     bottomSheetRef.current?.present();
+
     setIsLoading(false);
   };
 
