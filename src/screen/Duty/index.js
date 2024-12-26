@@ -71,7 +71,6 @@ const Duty = () => {
     try {
       const token = await messaging().getToken();
       if (token) {
-        console.log(token);
         let response = await updateDriverPushToken(
           globalData.driverData.id,
           token

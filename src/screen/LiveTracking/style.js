@@ -46,6 +46,12 @@ const style = StyleSheet.create({
     justifyContent: "space-between",
     borderRadius: 8,
   },
+  showLocationContainer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 10,
+  },
   viewButton: {
     backgroundColor: "#fff",
     paddingVertical: 5,

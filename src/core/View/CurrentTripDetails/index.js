@@ -3,18 +3,17 @@ import {
   View,
   Text,
   Linking,
-  Image,
   TouchableOpacity,
   Pressable,
   Alert,
 } from "react-native";
 import MatIcon from "react-native-vector-icons/MaterialIcons";
 import FeatherIcon from "react-native-vector-icons/Feather";
+import FAIcon from "react-native-vector-icons/FontAwesome";
 import style from "./style";
 import commonStyles from "../../../constants/commonStyle";
 import { useTheme } from "../../../constants/ThemeContext";
 import { getInitials } from "../../helper/commonHelper";
-import imagePath from "../../../constants/imagePath";
 import { useNavigation } from "@react-navigation/native";
 import { patch } from "../../helper/services";
 import AppLoader from "../../component/AppLoader";
@@ -118,17 +117,31 @@ const CurrentTripDetails = ({ tripData, locationDetails, endCurrentTrip }) => {
   return (
     <View>
       {isLoading && <AppLoader />}
+
       <View style={style.durationContainer}>
-        <View style={[commonStyles.rowCenter, commonStyles.gap1]}>
-          <Text style={commonStyles.fnt12Medium}>You will reach in</Text>
+        <View style={[commonStyles.rowCenter, commonStyles.justifyBetween]}>
           <Text style={commonStyles.fnt12Medium}>
+            You will reach your {locationDetails.locationType} in{" "}
             {locationDetails?.travelDuration}
           </Text>
+
+          <Pressable onPress={confirmForCancellation}>
+            <FAIcon name="window-close" size={20} color={theme.danger} />
+          </Pressable>
         </View>
-        <Pressable onPress={showDirectionInGoogleMap}>
-          <Text style={[commonStyles.fnt12Medium, { color: theme.success }]}>
+        <Pressable
+          style={[commonStyles.rowCenter, commonStyles.gap1]}
+          onPress={showDirectionInGoogleMap}
+        >
+          <Text
+            style={[
+              commonStyles.fnt12Medium,
+              { color: theme.success, lineHeight: 16 },
+            ]}
+          >
             View in Google Map
           </Text>
+          <FAIcon name="map-o" size={16} color={theme.success} />
         </Pressable>
       </View>
 
@@ -155,7 +168,6 @@ const CurrentTripDetails = ({ tripData, locationDetails, endCurrentTrip }) => {
             </View>
           </View>
         </View>
-        <Image style={style.vehicleImage} source={imagePath.tataAce} />
       </View>
       <View style={style.paymentContainer}>
         <Text

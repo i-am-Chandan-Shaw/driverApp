@@ -79,6 +79,7 @@ const Register = ({ route }) => {
         await saveToLocalStorage(response.id);
       }
     } catch (error) {
+      emailExistsAlert();
       console.error("Error during registration:", error);
     } finally {
       setIsLoading(false);
@@ -120,6 +121,19 @@ const Register = ({ route }) => {
           onPress: () => {
             navigation.replace("Home", { driverData });
           },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const emailExistsAlert = () => {
+    Alert.alert(
+      "Email already exists",
+      "The entered email already exists, please try other email address !",
+      [
+        {
+          text: "OK",
         },
       ],
       { cancelable: false }
@@ -203,6 +217,8 @@ const Register = ({ route }) => {
                     onChangeText={(text) => validateInputs(text, "vehicleNo")}
                     value={formData.vehicleNo}
                     height={50}
+                    maxLength={10}
+                    minLength={8}
                     style={{ textTransform: "uppercase" }}
                     placeholder="Vehicle Number"
                   />
@@ -232,7 +248,8 @@ const Register = ({ route }) => {
             </View>
           </ScrollView>
           <TouchableOpacity
-            style={commonStyles.btnPrimary}
+            disabled={!checked}
+            style={checked ? commonStyles.btnPrimary : commonStyles.btnDisabled}
             onPress={validateForm}
           >
             <Text

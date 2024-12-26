@@ -5,7 +5,14 @@ import React, {
   useContext,
   useCallback,
 } from "react";
-import { View, Dimensions, Platform, Alert } from "react-native";
+import {
+  View,
+  Dimensions,
+  Platform,
+  Alert,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
 import {
@@ -38,31 +45,33 @@ const initialRegion = getInitialRegionForMap();
 const LiveTracking = (props) => {
   const { theme } = useTheme();
   const navigation = useNavigation();
-  
+
   const mapRef = useRef();
   const markerRef = useRef();
   const bottomSheetRef = useRef();
-
-  const [currentTrip, setCurrentTrip] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const snapPoints = [300, height - 310];
   const { globalData } = useContext(AppContext);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentTrip, setCurrentTrip] = useState(null);
+  const snapPoints = [320, height - 200];
+  const [mapDirectionResult, setMapDirectionResult] = useState(null);
   const [locationDetails, setLocationDetails] = useState({
     currentLocation: null,
     dropLocation: null,
     travelDuration: null,
     distanceLeft: null,
     hasTripStarted: false,
+    locationType: "pickup location",
   });
-
 
   const initializeMapDirectionPoints = (tripData) => {
     if (!tripData) {
       return null;
     }
-    const tripStarted = tripData.status == 4;
 
-    console.log(locationDetails.hasTripStarted);
+    console.log(tripData);
+
+    const tripStarted = tripData.status == 4;
 
     const endLat = tripStarted
       ? parseFloat(tripData.dropCoords.dropLat)
@@ -72,6 +81,10 @@ const LiveTracking = (props) => {
       ? parseFloat(tripData.dropCoords.dropLng)
       : parseFloat(tripData.pickUpCoords.pickUpLng);
 
+    const updatedLocationType = tripStarted
+      ? "drop location"
+      : "pickup location";
+
     const endLocation = {
       latitude: endLat,
       longitude: endLng,
@@ -80,6 +93,7 @@ const LiveTracking = (props) => {
     setLocationDetails((prevState) => ({
       ...prevState,
       dropLocation: endLocation,
+      locationType: updatedLocationType,
     }));
   };
 
@@ -93,31 +107,28 @@ const LiveTracking = (props) => {
       const { coordinates } = locationData;
 
       if (globalData.driverData) {
-        await updateTripLocationDetails(coordinates);
+        await updateDriverCurrentLocation(coordinates);
       }
-      setLocationDetails((prevState) => {
-        // animateMarkerMovement(coordinates.latitude, coordinates.longitude);
-        return {
-          ...prevState,
-          currentLocation: coordinates,
-        };
-      });
+      setLocationDetails((prevState) => ({
+        ...prevState,
+        currentLocation: coordinates,
+      }));
     } catch (error) {
       console.error("Error fetching location:", error);
     }
-  }, []);
+  }, [globalData.driverData, currentTrip]); // Include dependencies.
 
-  const updateTripLocationDetails = async (coordinates) => {
+  const updateDriverCurrentLocation = async (coordinates) => {
     if (!currentTrip) {
       return null;
     }
     const payload = {
-      id: currentTrip?.tripId,
-      driverLat: coordinates.latitude.toString(),
-      driverLng: coordinates.longitude.toString(),
+      id: globalData.driverData?.id,
+      lat: coordinates.latitude.toString(),
+      lng: coordinates.longitude.toString(),
     };
 
-    const endPoint = "patchRequestVehicle";
+    const endPoint = "patchDriver";
     try {
       const data = await patch(payload, endPoint);
       if (data) {
@@ -150,6 +161,7 @@ const LiveTracking = (props) => {
         }
         if (parseInt(tripStatus) === 4) {
           setCurrentTrip(trip[0]);
+          console.log(trip[0].status);
 
           initializeMapDirectionPoints(trip[0]);
         }
@@ -160,34 +172,68 @@ const LiveTracking = (props) => {
   }, [currentTrip?.tripId, navigation]);
 
   // -------------------------- Initialization Logic ------------------------------ //
+
   useEffect(() => {
-    onInitialLoad();
-    const updateInterval = setInterval(() => {
+    const initialize = async () => {
+      try {
+        // Check if trip data exists in route params and initialize the trip.
+        const tripData = props?.route?.params?.tripData;
+        if (tripData && !currentTrip) {
+          setCurrentTrip(tripData);
+          initializeMapDirectionPoints(tripData); // Initialize map points for the trip data.
+        } else if (!currentTrip) {
+          await fetchTripData(); // Fetch trip data if not already initialized.
+        }
+      } catch (error) {
+        console.error("Error during initial load:", error);
+      }
+    };
+
+    initialize();
+
+    // Set up interval for periodic API calls.
+    const intervalId = setInterval(() => {
       fetchCurrentLocationAndUpdate();
       getTripStatus();
     }, UPDATE_INTERVAL);
 
-    return () => clearInterval(updateInterval);
-  }, [fetchCurrentLocationAndUpdate, getTripStatus]);
+    return () => clearInterval(intervalId); // Cleanup the interval on component unmount.
+  }, [
+    props?.route.params.tripData,
+    currentTrip,
+    fetchCurrentLocationAndUpdate,
+    getTripStatus,
+  ]);
 
-  const onInitialLoad = () => {
-    if (props?.route.params.tripData) {
-      setCurrentTrip(props.route.params.tripData);
-    } else {
-      getTripStatus();
-    }
-    initializeMapDirectionPoints(currentTrip);
+  const onMapReady = (mapData) => {
+    mapRef.current.fitToCoordinates(mapData.coordinates, {
+      edgePadding: { top: 50, right: 50, bottom: 300, left: 50 },
+      animated: true,
+    });
+
+    const durationLeft = convertMinToHours(mapData.duration);
+    const distanceLeft = mapData.distance;
+    setMapDirectionResult(mapData);
+
+    setLocationDetails((prevState) => ({
+      ...prevState,
+      travelDuration: durationLeft,
+      distanceLeft,
+    }));
+
     bottomSheetRef.current?.present();
+
+    setIsLoading(false);
   };
 
-  const animateMarkerMovement = (latitude, longitude) => {
-    const newCoordinate = { latitude, longitude };
-    if (Platform.OS == "android") {
-      if (markerRef.current) {
-        markerRef.current.animateMarkerToCoordinate(newCoordinate, 8000);
-      }
+  const onCenter = () => {
+    if (mapDirectionResult) {
+      mapRef.current.fitToCoordinates(mapDirectionResult.coordinates, {
+        edgePadding: { top: 50, right: 50, bottom: 300, left: 50 },
+        animated: true,
+      });
     } else {
-      state.coordinate.timing(newCoordinate).start();
+      mapRef.current.animateToRegion(locationState.currentLocation);
     }
   };
 
@@ -196,6 +242,12 @@ const LiveTracking = (props) => {
       <BottomSheetModalProvider>
         {isLoading && <AppLoader />}
 
+        <TouchableOpacity
+          style={style.showLocationContainer}
+          onPress={onCenter}
+        >
+          <Image source={imagePath.liveLocationBtn} />
+        </TouchableOpacity>
         <MapView
           ref={mapRef}
           style={style.mapContainer}
@@ -204,7 +256,7 @@ const LiveTracking = (props) => {
           loadingEnabled={false}
           showsUserLocation={true}
           mapType={"standard"}
-          showsMyLocationButton={true}
+          showsMyLocationButton={false}
         >
           {locationDetails.currentLocation && (
             <>
@@ -237,19 +289,7 @@ const LiveTracking = (props) => {
               strokeColor={theme.bgPrimary}
               optimizeWaypoints={true}
               onReady={(result) => {
-                mapRef.current.fitToCoordinates(result.coordinates, {
-                  edgePadding: { top: 50, right: 50, bottom: 300, left: 50 },
-                  animated: true,
-                });
-
-                const durationLeft = convertMinToHours(result.duration);
-                const distanceLeft = result.distance;
-
-                setLocationDetails((prevState) => ({
-                  ...prevState,
-                  travelDuration: durationLeft,
-                  distanceLeft,
-                }));
+                onMapReady(result);
               }}
             />
           )}

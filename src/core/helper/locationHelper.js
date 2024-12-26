@@ -99,6 +99,9 @@ export const handleLocationPermission = async (shouldOpenSettings) => {
 export const fetchAndPrepareLocationData = async () => {
   try {
     const { latitude, longitude } = await getCurrentLocation();
+
+    console.log(latitude, longitude);
+
     if (!latitude || !longitude) throw new Error("Invalid coordinates");
 
     const currentAddress = await getAddressFromCoordinates(latitude, longitude);

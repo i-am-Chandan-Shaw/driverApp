@@ -17,9 +17,6 @@ const style = StyleSheet.create({
     alignItems: "center",
   },
   durationContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
     paddingVertical: 12,
     paddingHorizontal: 16,
     gap: 4,
@@ -57,6 +54,12 @@ const style = StyleSheet.create({
     paddingTop: 0,
     gap: 8,
   },
+  showLocationContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 10,
+  },
 
   circularContainer: {
     width: 50,
@@ -76,7 +79,7 @@ const style = StyleSheet.create({
   timeLine: {
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: 'flex-start',
+    justifyContent: "flex-start",
   },
   locationContainer: {
     flexDirection: "row",
@@ -99,7 +102,7 @@ const style = StyleSheet.create({
   },
   dottedLine: {
     width: 1,
-    flex:1,
+    flex: 1,
     borderLeftColor: "#778899",
     borderLeftWidth: 2,
     borderStyle: "dotted",
