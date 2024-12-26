@@ -52,6 +52,8 @@ const CurrentTripDetails = ({ tripData, locationDetails, endCurrentTrip }) => {
             },
           ]
         );
+      } else {
+        changeCurrentTripStatus(4);
       }
     }
   };

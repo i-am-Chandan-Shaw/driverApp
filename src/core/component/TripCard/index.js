@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import style from "./style";
 import MatIcon from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
@@ -37,16 +37,22 @@ const TripCard = ({ cardData, sendData }) => {
       const updatedTrip = await getUpdatedTripDetails(trip.tripId);
       if (!updatedTrip) return;
 
-      switch (parseInt(updatedTrip.status)) {
-        case 1:
-          await acceptTrip(updatedTrip);
-          break;
-        case 2:
-          sendData("invalid");
-          break;
-        default:
-          sendData("others");
-          break;
+      console.log(updatedTrip.status);
+
+      if (parseInt(updatedTrip.status) === 1) {
+        await acceptTrip(updatedTrip);
+      } else {
+        Alert.alert(
+          "Oops!",
+          "Other driver already accepted this ride. Stay online to get another ride.",
+          [
+            {
+              text: "OK",
+              onPress: () => sendData("invalid"),
+            },
+          ],
+          { cancelable: false }
+        );
       }
     } catch (error) {
       console.error("Error handling accept ride:", error);
