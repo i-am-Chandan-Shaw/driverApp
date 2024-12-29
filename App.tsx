@@ -3,6 +3,7 @@ import { AppProvider } from "./src/core/helper/AppContext";
 import { ThemeProvider } from "./src/constants/ThemeContext";
 import Navigation from "./src/navigation";
 import messaging from "@react-native-firebase/messaging";
+import { checkAppVersion } from "./src/core/helper/apiHelper";
 
 function App() {
   useEffect(() => {
@@ -18,7 +19,7 @@ function App() {
         console.warn("Messaging permissions not granted");
       }
     };
-
+    checkAppVersion();
     requestPermission();
   }, []);
   return (
