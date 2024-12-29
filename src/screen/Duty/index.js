@@ -126,6 +126,8 @@ const Duty = () => {
 
       const { coordinates, address } = locationData;
 
+      console.log(address);
+
       const driverDetailsPayload = {
         id: globalData?.driverData?.id,
         currentLocation: {

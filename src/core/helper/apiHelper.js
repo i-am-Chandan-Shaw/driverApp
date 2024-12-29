@@ -5,6 +5,7 @@ export const updateDriverPushToken = async (driverId, pushToken) => {
     id: driverId,
     pushToken,
   };
+
   try {
     const response = await patch(payload, "patchDriver");
     return response;
