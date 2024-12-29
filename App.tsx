@@ -3,8 +3,6 @@ import { AppProvider } from "./src/core/helper/AppContext";
 import { ThemeProvider } from "./src/constants/ThemeContext";
 import Navigation from "./src/navigation";
 import messaging from "@react-native-firebase/messaging";
-import { Alert } from "react-native";
-import notifee from "@notifee/react-native";
 
 function App() {
   useEffect(() => {
@@ -31,5 +29,9 @@ function App() {
     </ThemeProvider>
   );
 }
+
+messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+  console.log("Message handled in the background:", remoteMessage);
+});
 
 export default App;
